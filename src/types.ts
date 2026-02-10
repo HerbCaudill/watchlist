@@ -31,4 +31,6 @@ export interface MediaItem {
   ratings: Ratings
   /** Weighted average of available scores on a 0-100 scale, or null if no scores are available. */
   normalizedScore?: number | null
+  /** YouTube video key for the trailer, if available. */
+  trailerKey?: string | null
 }
