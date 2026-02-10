@@ -66,6 +66,14 @@ API keys are loaded via Vite's `import.meta.env`:
 
 ## Known issues
 
+- **Effect version pinned to 3.14.21**: The `effect` dependency is pinned to match `@dxos/echo`'s
+  exact version. A version mismatch causes `[TypeId]` unique symbol conflicts that break type
+  compatibility between DXOS schema types and Effect Schema types in `tsc -b` composite builds.
+  When upgrading DXOS, check `node_modules/@dxos/echo/package.json` for its `effect` version and
+  keep the project's `effect` dependency in sync.
+- **DXOS object creation**: Use `Obj.make()` from `@dxos/echo` (not `live()` from
+  `@dxos/react-client/echo`) to create typed ECHO objects. `Obj.make` properly omits the `[KindId]`
+  symbol from creation props; `live()` uses a different `CreationProps` type that doesn't.
 - **DXOS shell + React 19**: `@dxos/shell@0.8.3` bundles React 18 jsx-runtime that references
   `ReactCurrentDispatcher`, removed in React 19. The `shell` prop on `ClientProvider` is omitted
   in `main.tsx` until DXOS is upgraded to a React 19-compatible version.
