@@ -11,7 +11,7 @@ export function SearchBar({ value, onChange, onSubmit, onClear }: Props) {
   }
 
   return (
-    <div className="relative flex items-center">
+    <div className="relative -mx-2 flex items-center rounded-md bg-[#660000] p-2">
       <IconSearch
         data-testid="search-icon"
         className="text-muted-foreground pointer-events-none absolute left-3 size-5"
