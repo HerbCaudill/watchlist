@@ -39,7 +39,7 @@ Run a single Playwright test: `pnpm test:pw e2e/foo.spec.ts`
 - **Storybook 8** for component development and visual testing
 - **Vitest** (jsdom) for unit tests, **Playwright** for E2E
 - **Effect Schema** for API response decoding (planned)
-- **DXOS** for local-first persistence (planned)
+- **DXOS 0.8.3** for local-first persistence (ClientProvider wraps App in `main.tsx`)
 
 ## Path alias
 
@@ -63,6 +63,14 @@ API keys are loaded via Vite's `import.meta.env`:
 
 - `VITE_TMDB_API_KEY` — The Movie Database API key
 - `VITE_OMDB_API_KEY` — Open Movie Database API key
+
+## Known issues
+
+- **DXOS shell + React 19**: `@dxos/shell@0.8.3` bundles React 18 jsx-runtime that references
+  `ReactCurrentDispatcher`, removed in React 19. The `shell` prop on `ClientProvider` is omitted
+  in `main.tsx` until DXOS is upgraded to a React 19-compatible version.
+- **DXOS React 18 dep**: `@dxos/echo-signals` depends on `react@18.2.0` directly. The Vite config
+  uses `resolve.alias` to force all imports to the project's React 19 to avoid dual instances.
 
 ## Prettier config
 
