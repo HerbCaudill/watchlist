@@ -10,6 +10,9 @@ import path from "path"
 export default defineConfig({
   server: {
     port: 5179,
+    warmup: {
+      clientFiles: ["./src/main.tsx"],
+    },
   },
   plugins: [
     wasm(),
@@ -32,12 +35,18 @@ export default defineConfig({
       },
     }),
   ],
+  worker: {
+    format: "es",
+    plugins: () => [topLevelAwait(), wasm()],
+  },
   build: {
     target: "esnext",
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      react: path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
   },
 })
