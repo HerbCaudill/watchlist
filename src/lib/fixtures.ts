@@ -57,7 +57,7 @@ export const noRatingsFixture: MediaItem = {
   tmdbId: 88888,
   title: "Upcoming Unreleased Movie",
   year: 2026,
-  posterUrl: "https://image.tmdb.org/t/p/w500/placeholder.jpg",
+  posterUrl: "https://image.tmdb.org/t/p/w500/xCHmhHeO7aOCMlzcNukGH6Q7EiD.jpg",
   mediaType: "movie",
   overview: "A film so new that no review aggregators have scored it yet.",
   ratings: {},
@@ -90,7 +90,7 @@ export const longTitleTvFixture: MediaItem = {
   title:
     "The Completely True and Totally Not Exaggerated Adventures of a Small Town Detective in Rural England",
   year: 2021,
-  posterUrl: "https://image.tmdb.org/t/p/w500/longTitleShow.jpg",
+  posterUrl: "https://image.tmdb.org/t/p/w500/z9gCSwIObDOD2BEtmUwfasar3xs.jpg",
   mediaType: "tv",
   overview:
     "A quirky British detective series set in a picturesque village where nothing is quite as it seems.",
