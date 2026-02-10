@@ -21,6 +21,8 @@ pnpm test:pw:ui           # Playwright UI mode
 pnpm test:all             # Full suite: typecheck + vitest + playwright
 pnpm typecheck            # TypeScript type checking only
 pnpm format               # Prettier formatting
+pnpm storybook            # Storybook dev server on port 6006
+pnpm build:storybook      # Build static Storybook site
 ```
 
 Run a single Vitest test: `pnpm test run src/lib/tests/foo.test.ts`
@@ -34,6 +36,7 @@ Run a single Playwright test: `pnpm test:pw e2e/foo.spec.ts`
 - **Shadcn UI** (New York style) + **Radix UI** primitives + **Tabler icons**
 - **IBM Plex** fonts (Sans, Serif, Mono)
 - **PWA** via `vite-plugin-pwa` with auto-update service worker
+- **Storybook 8** for component development and visual testing
 - **Vitest** (jsdom) for unit tests, **Playwright** for E2E
 - **Effect Schema** for API response decoding (planned)
 - **DXOS** for local-first persistence (planned)
@@ -57,6 +60,7 @@ Key types are in `src/types.ts`. Fixtures for stories/tests go in `src/lib/fixtu
 ## Environment variables
 
 API keys are loaded via Vite's `import.meta.env`:
+
 - `VITE_TMDB_API_KEY` — The Movie Database API key
 - `VITE_OMDB_API_KEY` — Open Movie Database API key
 
