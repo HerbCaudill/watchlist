@@ -1,3 +1,5 @@
+declare let onconnect: ((event: MessageEvent) => void) | null
+
 /**
  * DXOS shared worker entry point. ECHO runs inside this SharedWorker so that
  * multiple tabs share a single client instance. The async import works around

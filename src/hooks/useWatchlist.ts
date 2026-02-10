@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react"
 import { useSpace, useQuery, Filter } from "@dxos/react-client/echo"
-import { live } from "@dxos/react-client/echo"
+import { Obj } from "@dxos/echo"
 import { WatchlistItem } from "@/schema/WatchlistItem"
 import type { MediaItem } from "@/types"
 
@@ -16,7 +16,7 @@ export function useWatchlist() {
   const add = useCallback(
     (/** The media item to add */ item: MediaItem) => {
       if (!space) return
-      const watchlistItem = live(WatchlistItem, {
+      const watchlistItem = Obj.make(WatchlistItem, {
         tmdbId: item.tmdbId,
         title: item.title,
         year: item.year,

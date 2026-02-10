@@ -30,7 +30,17 @@ vi.mock("@dxos/react-client/echo", () => ({
   Filter: {
     type: vi.fn(),
   },
-  live: (_schema: any, data: any) => data,
+}))
+
+vi.mock("@dxos/echo", () => ({
+  Obj: {
+    make: (_schema: any, data: any) => data,
+  },
+  Type: {
+    Obj: () => (self: any) => self,
+    getTypename: () => "",
+    getVersion: () => "",
+  },
 }))
 
 describe("useWatchlist", () => {

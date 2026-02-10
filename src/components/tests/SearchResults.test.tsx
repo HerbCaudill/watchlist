@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
-import { movieFixture, tvShowFixture, noPosterFixture, fixtures } from "@/lib/fixtures"
+import { movieFixture, tvShowFixture, fixtures } from "@/lib/fixtures"
 import { SearchResults } from "../SearchResults"
 
 describe("SearchResults", () => {
