@@ -24,10 +24,8 @@ export function AppShell({
           onSubmit={onSearchSubmit}
           onClear={onSearchClear}
         />
-        <div className="flex items-center justify-between">
-          <TabBar activeTab={activeTab} onTabChange={onTabChange} />
-          <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
-        </div>
+        <TabBar activeTab={activeTab} onTabChange={onTabChange} />
+        <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
       </header>
       <main className="flex-1 px-4 py-4">{children}</main>
     </div>
