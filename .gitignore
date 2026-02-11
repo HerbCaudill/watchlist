@@ -29,6 +29,7 @@ dist-ssr
 # Test output
 test-results
 playwright-report
+.playwright-mcp/
 .vercel
 
 # Environment variables
