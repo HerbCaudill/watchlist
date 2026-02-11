@@ -26,15 +26,15 @@ const bareMovie: MediaItem = {
   ratings: {},
 }
 
-/** A second bare movie item. */
-const bareMovie2: MediaItem = {
-  id: "movie-680",
-  tmdbId: 680,
-  title: "Pulp Fiction",
-  year: 1994,
-  posterUrl: "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
-  mediaType: "movie",
-  overview: "The lives of two mob hitmen intertwine in four tales of violence and redemption.",
+/** A bare TV item. */
+const bareTvShow: MediaItem = {
+  id: "tv-1396",
+  tmdbId: 1396,
+  title: "Breaking Bad",
+  year: 2008,
+  posterUrl: "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+  mediaType: "tv",
+  overview: "A high school chemistry teacher turned meth manufacturer.",
   ratings: {},
 }
 
@@ -50,15 +50,15 @@ const enrichedMovie: MediaItem = {
   trailerKey: "dQw4w9WgXcQ",
 }
 
-/** An enriched version of bareMovie2 with ratings and trailer. */
-const enrichedMovie2: MediaItem = {
-  ...bareMovie2,
+/** An enriched version of bareTvShow. */
+const enrichedTvShow: MediaItem = {
+  ...bareTvShow,
   ratings: {
-    rottenTomatoes: { critics: 92, audience: 96 },
-    metacritic: 94,
-    imdb: { score: 8.9, votes: 2100000 },
+    rottenTomatoes: { critics: 96, audience: 96 },
+    metacritic: 87,
+    imdb: { score: 9.5, votes: 2000000 },
   },
-  normalizedScore: 93,
+  normalizedScore: 95,
   trailerKey: "abc123",
 }
 
@@ -72,7 +72,8 @@ describe("useSearch", () => {
     const { result } = renderHook(() => useSearch())
 
     expect(result.current.query).toBe("")
-    expect(result.current.results).toEqual([])
+    expect(result.current.movieResults).toEqual([])
+    expect(result.current.tvResults).toEqual([])
     expect(result.current.isLoading).toBe(false)
   })
 
@@ -101,14 +102,46 @@ describe("useSearch", () => {
     })
 
     act(() => {
-      result.current.search("movie")
+      result.current.search()
     })
 
     expect(result.current.isLoading).toBe(true)
   })
 
+  it("searches both movies and TV shows in parallel", async () => {
+    vi.mocked(searchTmdb).mockImplementation(async (_query, mediaType) => {
+      if (mediaType === "movie") return [bareMovie]
+      return [bareTvShow]
+    })
+    vi.mocked(enrichMediaItem).mockImplementation(async (item: MediaItem) => {
+      if (item.mediaType === "movie") return enrichedMovie
+      return enrichedTvShow
+    })
+
+    const { result } = renderHook(() => useSearch())
+
+    act(() => {
+      result.current.setQuery("fight")
+    })
+
+    await act(async () => {
+      result.current.search()
+    })
+
+    expect(searchTmdb).toHaveBeenCalledWith("fight", "movie")
+    expect(searchTmdb).toHaveBeenCalledWith("fight", "tv")
+
+    await waitFor(() => {
+      expect(result.current.movieResults.length).toBe(1)
+      expect(result.current.tvResults.length).toBe(1)
+    })
+  })
+
   it("sets unenriched results immediately for fast display", async () => {
-    vi.mocked(searchTmdb).mockResolvedValue([bareMovie, bareMovie2])
+    vi.mocked(searchTmdb).mockImplementation(async (_query, mediaType) => {
+      if (mediaType === "movie") return [bareMovie]
+      return [bareTvShow]
+    })
     vi.mocked(enrichMediaItem).mockImplementation(
       () => new Promise(resolve => setTimeout(() => resolve(enrichedMovie), 100)),
     )
@@ -120,26 +153,25 @@ describe("useSearch", () => {
     })
 
     await act(async () => {
-      result.current.search("movie")
+      result.current.search()
     })
 
-    // After searchTmdb resolves, we should have unenriched results
     await waitFor(() => {
-      expect(result.current.results.length).toBe(2)
+      expect(result.current.movieResults.length).toBe(1)
     })
 
-    // Results should initially be the bare (unenriched) items
-    expect(result.current.results[0].ratings).toEqual({})
-    expect(result.current.results[1].ratings).toEqual({})
+    expect(result.current.movieResults[0].ratings).toEqual({})
+    expect(result.current.tvResults[0].ratings).toEqual({})
   })
 
   it("enriches results in the background and updates as they come in", async () => {
-    vi.mocked(searchTmdb).mockResolvedValue([bareMovie, bareMovie2])
-
-    // Enrichment resolves at different times
+    vi.mocked(searchTmdb).mockImplementation(async (_query, mediaType) => {
+      if (mediaType === "movie") return [bareMovie]
+      return [bareTvShow]
+    })
     vi.mocked(enrichMediaItem).mockImplementation(async (item: MediaItem) => {
-      if (item.id === bareMovie.id) return enrichedMovie
-      return enrichedMovie2
+      if (item.mediaType === "movie") return enrichedMovie
+      return enrichedTvShow
     })
 
     const { result } = renderHook(() => useSearch())
@@ -149,20 +181,23 @@ describe("useSearch", () => {
     })
 
     await act(async () => {
-      result.current.search("movie")
+      result.current.search()
     })
 
-    // Wait for all enrichments to complete
     await waitFor(() => {
-      expect(result.current.results[0].normalizedScore).toBe(82)
+      expect(result.current.movieResults[0].normalizedScore).toBe(82)
+      expect(result.current.tvResults[0].normalizedScore).toBe(95)
     })
 
-    expect(result.current.results[0]).toEqual(enrichedMovie)
-    expect(result.current.results[1]).toEqual(enrichedMovie2)
+    expect(result.current.movieResults[0]).toEqual(enrichedMovie)
+    expect(result.current.tvResults[0]).toEqual(enrichedTvShow)
   })
 
   it("sets isLoading to false after all enrichments complete", async () => {
-    vi.mocked(searchTmdb).mockResolvedValue([bareMovie])
+    vi.mocked(searchTmdb).mockImplementation(async (_query, mediaType) => {
+      if (mediaType === "movie") return [bareMovie]
+      return []
+    })
     vi.mocked(enrichMediaItem).mockResolvedValue(enrichedMovie)
 
     const { result } = renderHook(() => useSearch())
@@ -172,29 +207,12 @@ describe("useSearch", () => {
     })
 
     await act(async () => {
-      result.current.search("movie")
+      result.current.search()
     })
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
-  })
-
-  it("passes the query and mediaType to searchTmdb", async () => {
-    vi.mocked(searchTmdb).mockResolvedValue([])
-    vi.mocked(enrichMediaItem).mockResolvedValue(enrichedMovie)
-
-    const { result } = renderHook(() => useSearch())
-
-    act(() => {
-      result.current.setQuery("breaking bad")
-    })
-
-    await act(async () => {
-      result.current.search("tv")
-    })
-
-    expect(searchTmdb).toHaveBeenCalledWith("breaking bad", "tv")
   })
 
   it("handles empty search results", async () => {
@@ -207,22 +225,26 @@ describe("useSearch", () => {
     })
 
     await act(async () => {
-      result.current.search("movie")
+      result.current.search()
     })
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.results).toEqual([])
+    expect(result.current.movieResults).toEqual([])
+    expect(result.current.tvResults).toEqual([])
     expect(enrichMediaItem).not.toHaveBeenCalled()
   })
 
   it("handles enrichment failure gracefully, keeping the unenriched item", async () => {
-    vi.mocked(searchTmdb).mockResolvedValue([bareMovie, bareMovie2])
+    vi.mocked(searchTmdb).mockImplementation(async (_query, mediaType) => {
+      if (mediaType === "movie") return [bareMovie]
+      return [bareTvShow]
+    })
     vi.mocked(enrichMediaItem).mockImplementation(async (item: MediaItem) => {
-      if (item.id === bareMovie.id) throw new Error("OMDB down")
-      return enrichedMovie2
+      if (item.mediaType === "movie") throw new Error("OMDB down")
+      return enrichedTvShow
     })
 
     const { result } = renderHook(() => useSearch())
@@ -232,18 +254,15 @@ describe("useSearch", () => {
     })
 
     await act(async () => {
-      result.current.search("movie")
+      result.current.search()
     })
 
-    // Wait for enrichment to settle
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    // The failed item keeps its unenriched state
-    expect(result.current.results[0]).toEqual(bareMovie)
-    // The successful item gets enriched
-    expect(result.current.results[1]).toEqual(enrichedMovie2)
+    expect(result.current.movieResults[0]).toEqual(bareMovie)
+    expect(result.current.tvResults[0]).toEqual(enrichedTvShow)
   })
 
   it("does not search with an empty query", async () => {
@@ -252,49 +271,45 @@ describe("useSearch", () => {
     const { result } = renderHook(() => useSearch())
 
     await act(async () => {
-      result.current.search("movie")
+      result.current.search()
     })
 
     expect(searchTmdb).not.toHaveBeenCalled()
-    expect(result.current.results).toEqual([])
+    expect(result.current.movieResults).toEqual([])
+    expect(result.current.tvResults).toEqual([])
     expect(result.current.isLoading).toBe(false)
   })
 
-  it("replaces previous results when a new search is performed", async () => {
-    vi.mocked(searchTmdb).mockResolvedValueOnce([bareMovie]).mockResolvedValueOnce([bareMovie2])
-
-    vi.mocked(enrichMediaItem)
-      .mockResolvedValueOnce(enrichedMovie)
-      .mockResolvedValueOnce(enrichedMovie2)
+  it("clears results when clear is called", async () => {
+    vi.mocked(searchTmdb).mockImplementation(async (_query, mediaType) => {
+      if (mediaType === "movie") return [bareMovie]
+      return [bareTvShow]
+    })
+    vi.mocked(enrichMediaItem).mockImplementation(async (item: MediaItem) => {
+      if (item.mediaType === "movie") return enrichedMovie
+      return enrichedTvShow
+    })
 
     const { result } = renderHook(() => useSearch())
 
-    // First search
     act(() => {
-      result.current.setQuery("fight club")
+      result.current.setQuery("fight")
     })
 
     await act(async () => {
-      result.current.search("movie")
+      result.current.search()
     })
 
     await waitFor(() => {
-      expect(result.current.results[0]?.title).toBe("Fight Club")
+      expect(result.current.movieResults.length).toBe(1)
     })
 
-    // Second search
     act(() => {
-      result.current.setQuery("pulp fiction")
+      result.current.clear()
     })
 
-    await act(async () => {
-      result.current.search("movie")
-    })
-
-    await waitFor(() => {
-      expect(result.current.results[0]?.title).toBe("Pulp Fiction")
-    })
-
-    expect(result.current.results.length).toBe(1)
+    expect(result.current.movieResults).toEqual([])
+    expect(result.current.tvResults).toEqual([])
+    expect(result.current.isLoading).toBe(false)
   })
 })

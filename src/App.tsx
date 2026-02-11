@@ -12,7 +12,7 @@ import type { MediaItem, MediaType, Tab } from "@/types"
 
 /** Root application component. Wires search, watchlist, and navigation state into the AppShell. */
 export function App() {
-  const { query, setQuery, search, results, isLoading, clear } = useSearch()
+  const { query, setQuery, search, movieResults, tvResults, isLoading, clear } = useSearch()
   const watchlist = useWatchlist()
 
   const [activeTab, setActiveTab] = useState<Tab>("discover")
@@ -22,14 +22,14 @@ export function App() {
   /** Debounced query for triggering search after the user stops typing. */
   const debouncedQuery = useDebounce(query, 300)
 
-  /** Auto-search when the debounced query or media type changes. */
+  /** Auto-search when the debounced query changes. */
   useEffect(() => {
     if (debouncedQuery.trim()) {
-      search(mediaType)
+      search()
     } else {
       clear()
     }
-  }, [debouncedQuery, mediaType])
+  }, [debouncedQuery])
 
   /** Convert DXOS WatchlistItems to MediaItems for the UI. */
   const watchlistMediaItems = useMemo(
@@ -95,7 +95,8 @@ export function App() {
         <SearchCombobox
           query={query}
           onQueryChange={setQuery}
-          results={results}
+          movieResults={movieResults}
+          tvResults={tvResults}
           isLoading={isLoading}
           watchlistIds={watchlistIds}
           onAdd={handleAdd}
