@@ -71,7 +71,7 @@ export const longTitleFixture: MediaItem = {
   title:
     "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb — The Director's Extended Cut",
   year: 1964,
-  posterUrl: "https://image.tmdb.org/t/p/w500/drgFp8V1vNPm3rEFsRvLTEOHsAx.jpg",
+  posterUrl: "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
   mediaType: "movie",
   overview:
     "An insane general triggers a path to nuclear holocaust that a war room full of politicians and generals frantically tries to stop.",
