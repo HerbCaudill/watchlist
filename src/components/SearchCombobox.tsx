@@ -21,6 +21,13 @@ export function SearchCombobox({
   /** Whether the dropdown should be visible. */
   const showDropdown = open && query.trim().length > 0
 
+  /** Handle keyboard shortcuts on the input. */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setOpen(false)
+    }
+  }
+
   /** Handle item selection — add to watchlist if not already there. */
   const handleSelect = (itemId: string) => {
     const item = results.find(r => r.id === itemId)
@@ -47,6 +54,7 @@ export function SearchCombobox({
           ref={inputRef}
           value={query}
           onValueChange={onQueryChange}
+          onKeyDown={handleKeyDown}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder="Search movies & TV shows..."
