@@ -17,17 +17,21 @@ export function AppShell({
 }: Props) {
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col">
-      <header className="flex flex-col gap-3 px-4 pt-4">
+      <div className="px-4 pt-4 pb-3">
         <SearchBar
           value={searchValue}
           onChange={onSearchChange}
           onSubmit={onSearchSubmit}
           onClear={onSearchClear}
         />
-        <TabBar activeTab={activeTab} onTabChange={onTabChange} />
-        <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
-      </header>
-      <main className="flex-1 px-4 py-4">{children}</main>
+      </div>
+      <div className="flex flex-1 flex-col rounded-t-xl bg-white">
+        <header className="flex flex-col gap-3 px-4 pt-4">
+          <TabBar activeTab={activeTab} onTabChange={onTabChange} />
+          <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
+        </header>
+        <main className="flex-1 px-4 py-4">{children}</main>
+      </div>
     </div>
   )
 }
