@@ -12,8 +12,8 @@ export function AppShell({
   children,
 }: Props) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col">
-      <div className="flex items-center gap-2 pt-4 pb-3">
+    <div className="mx-auto flex min-h-screen max-w-2xl flex-col p-2">
+      <div className="flex items-center gap-2 py-1">
         <div className="min-w-0 flex-1">{searchSlot}</div>
         <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
       </div>
