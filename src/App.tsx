@@ -49,11 +49,6 @@ export function App() {
     clear()
   }
 
-  /** Add a media item to the watchlist. */
-  const handleAdd = (item: MediaItem) => {
-    watchlist.add(item)
-  }
-
   /** Toggle a media item on/off the watchlist. */
   const handleToggleWatchlist = (item: MediaItem) => {
     if (watchlist.isOnWatchlist(item.tmdbId)) {
@@ -99,7 +94,7 @@ export function App() {
           tvResults={tvResults}
           isLoading={isLoading}
           watchlistIds={watchlistIds}
-          onAdd={handleAdd}
+          onSelect={setSelectedItem}
           onClear={handleSearchClear}
         />
       }

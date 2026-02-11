@@ -5,7 +5,7 @@ import { cx } from "@/lib/utils"
 import { ScoreBadge } from "@/components/ScoreBadge"
 import type { MediaItem } from "@/types"
 
-/** Search input with a dropdown of results. Keyboard-navigable: arrow keys to browse, Enter to add. */
+/** Search input with a dropdown of results. Keyboard-navigable: arrow keys to browse, Enter to open detail. */
 export function SearchCombobox({
   query,
   onQueryChange,
@@ -13,7 +13,7 @@ export function SearchCombobox({
   tvResults,
   isLoading,
   watchlistIds,
-  onAdd,
+  onSelect,
   onClear,
 }: Props) {
   const [open, setOpen] = useState(false)
@@ -30,12 +30,13 @@ export function SearchCombobox({
     }
   }
 
-  /** Handle item selection — add to watchlist if not already there. */
+  /** Handle item selection — open detail view and close dropdown. */
   const handleSelect = (itemId: string) => {
     const allResults = [...movieResults, ...tvResults]
     const item = allResults.find(r => r.id === itemId)
-    if (item && !watchlistIds.has(item.id)) {
-      onAdd(item)
+    if (item) {
+      setOpen(false)
+      onSelect(item)
     }
   }
 
@@ -52,12 +53,10 @@ export function SearchCombobox({
       <CommandPrimitive.Item
         key={item.id}
         value={item.id}
-        disabled={onWatchlist}
         onSelect={() => handleSelect(item.id)}
         className={cx(
           "flex cursor-default items-center gap-3 px-3 py-1.5 text-sm select-none",
           "data-[selected=true]:bg-accent",
-          onWatchlist && "opacity-50",
         )}
       >
         {/* Left: poster thumbnail */}
@@ -173,8 +172,8 @@ type Props = {
   isLoading: boolean
   /** Set of media item IDs already on the watchlist. */
   watchlistIds: Set<string>
-  /** Called when the user selects an item to add to the watchlist. */
-  onAdd: (item: MediaItem) => void
+  /** Called when the user selects an item to view its detail. */
+  onSelect: (item: MediaItem) => void
   /** Called when the user clears the search input. */
   onClear: () => void
 }
