@@ -85,7 +85,7 @@ export function SearchCombobox({
   }
 
   return (
-    <CommandPrimitive shouldFilter={false} className="relative">
+    <CommandPrimitive shouldFilter={false}>
       {/* Search input */}
       <div className="relative flex items-center">
         <IconSearch
