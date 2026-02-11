@@ -57,6 +57,8 @@ The app follows a phased implementation plan:
 
 Key types are in `src/types.ts`. Fixtures for stories/tests go in `src/lib/fixtures.ts`.
 
+Search UX: the `SearchCombobox` input in `App` autofocuses on initial render.
+
 ## Environment variables
 
 API keys are loaded via Vite's `import.meta.env`:

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Command as CommandPrimitive } from "cmdk"
 import { IconCheck, IconMovie, IconSearch, IconX } from "@tabler/icons-react"
 import { cx } from "@/lib/utils"
@@ -17,6 +17,11 @@ export function SearchCombobox({
 }: Props) {
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  /** Focus the search input when the component mounts. */
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
 
   /** Whether the dropdown should be visible. */
   const hasResults = results.length > 0

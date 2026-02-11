@@ -45,6 +45,11 @@ describe("App", () => {
     expect(screen.getByPlaceholderText("Search movies & TV shows...")).toBeInTheDocument()
   })
 
+  it("autofocuses the search input on initial render", () => {
+    render(<App />)
+    expect(screen.getByPlaceholderText("Search movies & TV shows...")).toHaveFocus()
+  })
+
   it("renders Discover and Watchlist tabs", () => {
     render(<App />)
     expect(screen.getByRole("tab", { name: /discover/i })).toBeInTheDocument()
