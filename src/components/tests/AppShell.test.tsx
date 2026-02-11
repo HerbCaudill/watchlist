@@ -6,17 +6,14 @@ import { AppShell } from "@/components/AppShell"
 describe("AppShell", () => {
   /** Default props for rendering the AppShell in tests. */
   const defaultProps = {
-    searchValue: "",
-    onSearchChange: vi.fn(),
-    onSearchSubmit: vi.fn(),
-    onSearchClear: vi.fn(),
+    searchSlot: <input role="searchbox" placeholder="Search..." />,
     activeTab: "discover" as const,
     onTabChange: vi.fn(),
     mediaType: "movie" as const,
     onMediaTypeChange: vi.fn(),
   }
 
-  it("renders the SearchBar", () => {
+  it("renders the search slot", () => {
     render(<AppShell {...defaultProps}>content</AppShell>)
     expect(screen.getByRole("searchbox")).toBeInTheDocument()
   })
@@ -44,15 +41,6 @@ describe("AppShell", () => {
     expect(screen.getByText("Hello world")).toBeInTheDocument()
   })
 
-  it("passes search value to SearchBar", () => {
-    render(
-      <AppShell {...defaultProps} searchValue="batman">
-        content
-      </AppShell>,
-    )
-    expect(screen.getByRole("searchbox")).toHaveValue("batman")
-  })
-
   it("passes activeTab to TabBar", () => {
     render(
       <AppShell {...defaultProps} activeTab="watchlist">
@@ -71,18 +59,6 @@ describe("AppShell", () => {
     )
     const tvButton = screen.getByRole("button", { name: /tv shows/i })
     expect(tvButton).toHaveAttribute("aria-pressed", "true")
-  })
-
-  it("calls onSearchChange when typing in the search bar", async () => {
-    const onSearchChange = vi.fn()
-    render(
-      <AppShell {...defaultProps} onSearchChange={onSearchChange}>
-        content
-      </AppShell>,
-    )
-    const input = screen.getByRole("searchbox")
-    await userEvent.type(input, "a")
-    expect(onSearchChange).toHaveBeenCalledWith("a")
   })
 
   it("calls onTabChange when clicking a tab", async () => {

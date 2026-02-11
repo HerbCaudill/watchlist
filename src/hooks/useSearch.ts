@@ -46,5 +46,11 @@ export function useSearch() {
     [query],
   )
 
-  return { query, setQuery, search, results, isLoading }
+  /** Clear all search results. */
+  const clear = useCallback(() => {
+    setResults([])
+    setIsLoading(false)
+  }, [])
+
+  return { query, setQuery, search, results, isLoading, clear }
 }

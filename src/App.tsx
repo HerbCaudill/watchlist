@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { AppShell } from "@/components/AppShell"
 import { DiscoverPlaceholder } from "@/components/DiscoverPlaceholder"
 import { MediaDetail } from "@/components/MediaDetail"
-import { SearchResults } from "@/components/SearchResults"
+import { SearchCombobox } from "@/components/SearchCombobox"
 import { WatchlistView } from "@/components/WatchlistView"
+import { useDebounce } from "@/hooks/useDebounce"
 import { useSearch } from "@/hooks/useSearch"
 import { useWatchlist } from "@/hooks/useWatchlist"
 import { watchlistItemToMediaItem } from "@/lib/watchlistItemToMediaItem"
@@ -11,15 +12,24 @@ import type { MediaItem, MediaType, Tab } from "@/types"
 
 /** Root application component. Wires search, watchlist, and navigation state into the AppShell. */
 export function App() {
-  const { query, setQuery, search, results, isLoading } = useSearch()
+  const { query, setQuery, search, results, isLoading, clear } = useSearch()
   const watchlist = useWatchlist()
 
   const [activeTab, setActiveTab] = useState<Tab>("discover")
   const [mediaType, setMediaType] = useState<MediaType>("movie")
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null)
 
-  /** Whether the user has submitted at least one search. */
-  const [hasSearched, setHasSearched] = useState(false)
+  /** Debounced query for triggering search after the user stops typing. */
+  const debouncedQuery = useDebounce(query, 300)
+
+  /** Auto-search when the debounced query or media type changes. */
+  useEffect(() => {
+    if (debouncedQuery.trim()) {
+      search(mediaType)
+    } else {
+      clear()
+    }
+  }, [debouncedQuery, mediaType])
 
   /** Convert DXOS WatchlistItems to MediaItems for the UI. */
   const watchlistMediaItems = useMemo(
@@ -27,22 +37,21 @@ export function App() {
     [watchlist.items],
   )
 
-  /** Set of MediaItem IDs on the watchlist, for marking cards in search results. */
+  /** Set of MediaItem IDs on the watchlist, for marking items in search results. */
   const watchlistIds = useMemo(
     () => new Set(watchlistMediaItems.map(item => item.id)),
     [watchlistMediaItems],
   )
 
-  /** Submit the current search query. */
-  const handleSearchSubmit = () => {
-    setHasSearched(true)
-    search(mediaType)
-  }
-
   /** Clear the search query and results. */
   const handleSearchClear = () => {
     setQuery("")
-    setHasSearched(false)
+    clear()
+  }
+
+  /** Add a media item to the watchlist. */
+  const handleAdd = (item: MediaItem) => {
+    watchlist.add(item)
   }
 
   /** Toggle a media item on/off the watchlist. */
@@ -77,27 +86,22 @@ export function App() {
       )
     }
 
-    // Discover tab
-    if (!hasSearched) {
-      return <DiscoverPlaceholder />
-    }
-
-    return (
-      <SearchResults
-        items={results}
-        watchlistIds={watchlistIds}
-        onAdd={handleToggleWatchlist}
-        isLoading={isLoading}
-      />
-    )
+    return <DiscoverPlaceholder />
   }
 
   return (
     <AppShell
-      searchValue={query}
-      onSearchChange={setQuery}
-      onSearchSubmit={handleSearchSubmit}
-      onSearchClear={query ? handleSearchClear : undefined}
+      searchSlot={
+        <SearchCombobox
+          query={query}
+          onQueryChange={setQuery}
+          results={results}
+          isLoading={isLoading}
+          watchlistIds={watchlistIds}
+          onAdd={handleAdd}
+          onClear={handleSearchClear}
+        />
+      }
       activeTab={activeTab}
       onTabChange={setActiveTab}
       mediaType={mediaType}

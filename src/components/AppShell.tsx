@@ -1,14 +1,10 @@
 import type { MediaType, Tab } from "@/types"
-import { SearchBar } from "@/components/SearchBar"
 import { TabBar } from "@/components/TabBar"
 import { MediaToggle } from "@/components/MediaToggle"
 
-/** Overall app layout shell. Renders the search bar, tab bar, media toggle, and a content area for children. */
+/** Overall app layout shell. Renders the search area, tab bar, media toggle, and a content area for children. */
 export function AppShell({
-  searchValue,
-  onSearchChange,
-  onSearchSubmit,
-  onSearchClear,
+  searchSlot,
   activeTab,
   onTabChange,
   mediaType,
@@ -17,14 +13,7 @@ export function AppShell({
 }: Props) {
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col">
-      <div className="pt-4 pb-3">
-        <SearchBar
-          value={searchValue}
-          onChange={onSearchChange}
-          onSubmit={onSearchSubmit}
-          onClear={onSearchClear}
-        />
-      </div>
+      <div className="pt-4 pb-3">{searchSlot}</div>
       <div className="flex flex-1 flex-col rounded-t-xl bg-white">
         <header className="flex flex-col gap-3 px-4 pt-4">
           <TabBar activeTab={activeTab} onTabChange={onTabChange} />
@@ -38,14 +27,8 @@ export function AppShell({
 
 /** Props for the AppShell component. */
 type Props = {
-  /** The current search input value. */
-  searchValue: string
-  /** Called with the new value when the search input changes. */
-  onSearchChange: (value: string) => void
-  /** Called when the user submits the search (presses Enter). */
-  onSearchSubmit: () => void
-  /** Called when the user clears the search input. If undefined, no clear button is shown. */
-  onSearchClear?: () => void
+  /** The search UI rendered at the top of the shell. */
+  searchSlot: React.ReactNode
   /** The currently active tab. */
   activeTab: Tab
   /** Called when the user switches tabs. */

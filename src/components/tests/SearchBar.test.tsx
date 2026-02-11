@@ -6,14 +6,14 @@ import { SearchBar } from "@/components/SearchBar"
 describe("SearchBar", () => {
   it("renders an input with the given value", () => {
     render(<SearchBar value="batman" onChange={() => {}} onSubmit={() => {}} />)
-    const input = screen.getByRole("searchbox")
+    const input = screen.getByRole("textbox")
     expect(input).toHaveValue("batman")
   })
 
   it("calls onChange when the user types", async () => {
     const onChange = vi.fn()
     render(<SearchBar value="" onChange={onChange} onSubmit={() => {}} />)
-    const input = screen.getByRole("searchbox")
+    const input = screen.getByRole("textbox")
     await userEvent.type(input, "a")
     expect(onChange).toHaveBeenCalledWith("a")
   })
@@ -21,7 +21,7 @@ describe("SearchBar", () => {
   it("calls onSubmit when the user presses Enter", () => {
     const onSubmit = vi.fn()
     render(<SearchBar value="batman" onChange={() => {}} onSubmit={onSubmit} />)
-    const input = screen.getByRole("searchbox")
+    const input = screen.getByRole("textbox")
     fireEvent.keyDown(input, { key: "Enter" })
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
@@ -29,7 +29,7 @@ describe("SearchBar", () => {
   it("does not call onSubmit on other key presses", () => {
     const onSubmit = vi.fn()
     render(<SearchBar value="batman" onChange={() => {}} onSubmit={onSubmit} />)
-    const input = screen.getByRole("searchbox")
+    const input = screen.getByRole("textbox")
     fireEvent.keyDown(input, { key: "a" })
     expect(onSubmit).not.toHaveBeenCalled()
   })
@@ -64,7 +64,7 @@ describe("SearchBar", () => {
 
   it("has placeholder text", () => {
     render(<SearchBar value="" onChange={() => {}} onSubmit={() => {}} />)
-    const input = screen.getByRole("searchbox")
+    const input = screen.getByRole("textbox")
     expect(input).toHaveAttribute("placeholder")
   })
 })

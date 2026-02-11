@@ -6,6 +6,7 @@ import { App } from "./App"
 /** Mock the useSearch hook. */
 const mockSearch = vi.fn()
 const mockSetQuery = vi.fn()
+const mockClear = vi.fn()
 
 vi.mock("@/hooks/useSearch", () => ({
   useSearch: () => ({
@@ -14,6 +15,7 @@ vi.mock("@/hooks/useSearch", () => ({
     search: mockSearch,
     results: [],
     isLoading: false,
+    clear: mockClear,
   }),
 }))
 
@@ -39,7 +41,7 @@ describe("App", () => {
 
   it("renders a search input", () => {
     render(<App />)
-    expect(screen.getByRole("searchbox")).toBeInTheDocument()
+    expect(screen.getByPlaceholderText("Search movies & TV shows...")).toBeInTheDocument()
   })
 
   it("renders Discover and Watchlist tabs", () => {

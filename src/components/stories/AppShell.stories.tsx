@@ -14,16 +14,17 @@ type Story = StoryObj<typeof AppShell>
 
 /** Wrapper that manages all controlled state so the story is interactive. */
 function AppShellDemo({ initialTab = "discover" }: { initialTab?: Tab }) {
-  const [searchValue, setSearchValue] = useState("")
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [mediaType, setMediaType] = useState<MediaType>("movie")
 
   return (
     <AppShell
-      searchValue={searchValue}
-      onSearchChange={setSearchValue}
-      onSearchSubmit={() => alert(`Search: "${searchValue}"`)}
-      onSearchClear={() => setSearchValue("")}
+      searchSlot={
+        <input
+          placeholder="Search movies & TV shows..."
+          className="h-10 w-full rounded-md border px-3"
+        />
+      }
       activeTab={activeTab}
       onTabChange={setActiveTab}
       mediaType={mediaType}
