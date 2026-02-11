@@ -18,7 +18,7 @@ export function SearchBar({ value, onChange, onSubmit, onClear }: Props) {
         stroke={1.5}
       />
       <input
-        type="search"
+        type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
