@@ -2,7 +2,7 @@ import type { MediaType, Tab } from "@/types"
 import { TabBar } from "@/components/TabBar"
 import { MediaToggle } from "@/components/MediaToggle"
 
-/** Overall app layout shell. Renders the search area, tab bar, media toggle, and a content area for children. */
+/** Overall app layout shell. Renders the search area with media toggle, tab bar, and a content area for children. */
 export function AppShell({
   searchSlot,
   activeTab,
@@ -13,11 +13,13 @@ export function AppShell({
 }: Props) {
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col">
-      <div className="pt-4 pb-3">{searchSlot}</div>
+      <div className="flex items-center gap-2 pt-4 pb-3">
+        <div className="min-w-0 flex-1">{searchSlot}</div>
+        <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
+      </div>
       <div className="flex flex-1 flex-col rounded-t-xl bg-white">
-        <header className="flex flex-col gap-3 px-4 pt-4">
+        <header className="px-4 pt-4">
           <TabBar activeTab={activeTab} onTabChange={onTabChange} />
-          <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
         </header>
         <main className="flex-1 px-4 py-4">{children}</main>
       </div>

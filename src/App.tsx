@@ -90,8 +90,7 @@ export function App() {
         <SearchCombobox
           query={query}
           onQueryChange={setQuery}
-          movieResults={movieResults}
-          tvResults={tvResults}
+          results={mediaType === "movie" ? movieResults : tvResults}
           isLoading={isLoading}
           watchlistIds={watchlistIds}
           onSelect={setSelectedItem}

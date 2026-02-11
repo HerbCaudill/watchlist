@@ -9,8 +9,7 @@ import type { MediaItem } from "@/types"
 export function SearchCombobox({
   query,
   onQueryChange,
-  movieResults,
-  tvResults,
+  results,
   isLoading,
   watchlistIds,
   onSelect,
@@ -20,7 +19,7 @@ export function SearchCombobox({
   const inputRef = useRef<HTMLInputElement>(null)
 
   /** Whether the dropdown should be visible. */
-  const hasResults = movieResults.length > 0 || tvResults.length > 0
+  const hasResults = results.length > 0
   const showDropdown = open && query.trim().length > 0
 
   /** Handle keyboard shortcuts on the input. */
@@ -32,8 +31,7 @@ export function SearchCombobox({
 
   /** Handle item selection — open detail view and close dropdown. */
   const handleSelect = (itemId: string) => {
-    const allResults = [...movieResults, ...tvResults]
-    const item = allResults.find(r => r.id === itemId)
+    const item = results.find(r => r.id === itemId)
     if (item) {
       setOpen(false)
       onSelect(item)
@@ -132,24 +130,9 @@ export function SearchCombobox({
               <CommandPrimitive.Empty className="text-muted-foreground py-6 text-center text-sm">
                 No results found
               </CommandPrimitive.Empty>
-            : <>
-                {movieResults.length > 0 && (
-                  <CommandPrimitive.Group
-                    heading="Movies"
-                    className="text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden px-1 py-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium"
-                  >
-                    {movieResults.map(renderItem)}
-                  </CommandPrimitive.Group>
-                )}
-                {tvResults.length > 0 && (
-                  <CommandPrimitive.Group
-                    heading="TV shows"
-                    className="text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden px-1 py-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium"
-                  >
-                    {tvResults.map(renderItem)}
-                  </CommandPrimitive.Group>
-                )}
-              </>
+            : <CommandPrimitive.Group className="overflow-hidden px-1 py-1">
+                {results.map(renderItem)}
+              </CommandPrimitive.Group>
             }
           </CommandPrimitive.List>
         </div>
@@ -164,10 +147,8 @@ type Props = {
   query: string
   /** Called when the user types in the search input. */
   onQueryChange: (value: string) => void
-  /** Movie search results to display in the dropdown. */
-  movieResults: MediaItem[]
-  /** TV show search results to display in the dropdown. */
-  tvResults: MediaItem[]
+  /** Search results to display in the dropdown (filtered by the active media type). */
+  results: MediaItem[]
   /** Whether a search is currently in progress. */
   isLoading: boolean
   /** Set of media item IDs already on the watchlist. */

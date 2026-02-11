@@ -28,7 +28,7 @@ describe("AppShell", () => {
   it("renders the MediaToggle with both options", () => {
     render(<AppShell {...defaultProps}>content</AppShell>)
     expect(screen.getByRole("button", { name: /movies/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /tv shows/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /tv/i })).toBeInTheDocument()
   })
 
   it("renders children in the content area", () => {
@@ -57,7 +57,7 @@ describe("AppShell", () => {
         content
       </AppShell>,
     )
-    const tvButton = screen.getByRole("button", { name: /tv shows/i })
+    const tvButton = screen.getByRole("button", { name: /tv/i })
     expect(tvButton).toHaveAttribute("aria-pressed", "true")
   })
 
@@ -80,7 +80,7 @@ describe("AppShell", () => {
         content
       </AppShell>,
     )
-    const tvButton = screen.getByRole("button", { name: /tv shows/i })
+    const tvButton = screen.getByRole("button", { name: /tv/i })
     await userEvent.click(tvButton)
     expect(onMediaTypeChange).toHaveBeenCalledWith("tv")
   })
