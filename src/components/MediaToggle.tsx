@@ -4,7 +4,7 @@ import type { MediaType } from "@/types"
 /** Toggle between Movies and TV shows media types. */
 export function MediaToggle({ value, onChange }: Props) {
   return (
-    <div className="bg-muted inline-flex items-center gap-1 rounded-lg p-1" role="group">
+    <div className="bg-muted inline-flex self-start items-center gap-1 rounded-lg p-1" role="group">
       <ToggleButton label="Movies" isActive={value === "movie"} onClick={() => onChange("movie")} />
       <ToggleButton label="TV shows" isActive={value === "tv"} onClick={() => onChange("tv")} />
     </div>
