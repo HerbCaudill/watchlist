@@ -96,6 +96,11 @@ API keys are loaded via Vite's `import.meta.env`:
   in `main.tsx` until DXOS is upgraded to a React 19-compatible version.
 - **DXOS React 18 dep**: `@dxos/echo-signals` depends on `react@18.2.0` directly. The Vite config
   uses `resolve.alias` to force all imports to the project's React 19 to avoid dual instances.
+- **Rollup TDZ bug with DXOS SpaceProxy**: Rollup places `let _inspectCustom` declarations after
+  the class body that uses them as computed property keys, causing a temporal dead zone error in
+  production builds. The `fixRollupTdzPlugin()` in `vite.config.ts` patches these declarations
+  from `let` to `var` in the generated output (both main bundle and worker). This is needed until
+  Rollup fixes the variable ordering for class computed property keys.
 
 ## Prettier config
 
