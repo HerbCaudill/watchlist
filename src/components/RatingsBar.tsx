@@ -22,33 +22,12 @@ export function RatingsBar({ ratings }: Props) {
       {ratings.imdb && (
         <RatingDisplay
           label="IMDb"
-          value={`${ratings.imdb.score}/10`}
+          value={`${ratings.imdb.score}`}
           score={ratings.imdb.score * 10}
-          subtext={formatVotes(ratings.imdb.votes)}
         />
       )}
     </div>
   )
-}
-
-/** Format a vote count into a human-readable string (e.g. "1.2M votes", "340K votes", "340 votes"). */
-function formatVotes(
-  /** The raw number of votes. */
-  votes: number,
-): string {
-  if (votes >= 1_000_000) {
-    const millions = votes / 1_000_000
-    const formatted =
-      Number.isInteger(millions) ? `${millions}M` : `${parseFloat(millions.toFixed(1))}M`
-    return `${formatted} votes`
-  }
-  if (votes >= 1_000) {
-    const thousands = votes / 1_000
-    const formatted =
-      Number.isInteger(thousands) ? `${thousands}K` : `${parseFloat(thousands.toFixed(1))}K`
-    return `${formatted} votes`
-  }
-  return `${votes} votes`
 }
 
 /** Props for the RatingsBar component. */

@@ -16,7 +16,7 @@ describe("RatingsBar", () => {
     expect(screen.getByText("Metacritic")).toBeInTheDocument()
     expect(screen.getByText("75")).toBeInTheDocument()
     expect(screen.getByText("IMDb")).toBeInTheDocument()
-    expect(screen.getByText("8.5/10")).toBeInTheDocument()
+    expect(screen.getByText("8.5")).toBeInTheDocument()
   })
 
   it("renders only Rotten Tomatoes when only that rating is present", () => {
@@ -47,7 +47,7 @@ describe("RatingsBar", () => {
     }
     render(<RatingsBar ratings={ratings} />)
     expect(screen.getByText("IMDb")).toBeInTheDocument()
-    expect(screen.getByText("7.2/10")).toBeInTheDocument()
+    expect(screen.getByText("7.2")).toBeInTheDocument()
     expect(screen.queryByText("RT Critics")).not.toBeInTheDocument()
     expect(screen.queryByText("Metacritic")).not.toBeInTheDocument()
   })
@@ -58,27 +58,11 @@ describe("RatingsBar", () => {
     expect(container.firstChild?.childNodes.length ?? 0).toBe(0)
   })
 
-  it("shows IMDb vote count as subtext", () => {
+  it("does not show IMDb vote count", () => {
     const ratings: Ratings = {
       imdb: { score: 8.8, votes: 2200000 },
     }
     render(<RatingsBar ratings={ratings} />)
-    expect(screen.getByText("2.2M votes")).toBeInTheDocument()
-  })
-
-  it("formats vote counts under 1M with K suffix", () => {
-    const ratings: Ratings = {
-      imdb: { score: 6.5, votes: 340000 },
-    }
-    render(<RatingsBar ratings={ratings} />)
-    expect(screen.getByText("340K votes")).toBeInTheDocument()
-  })
-
-  it("formats small vote counts without suffix", () => {
-    const ratings: Ratings = {
-      imdb: { score: 6.2, votes: 340 },
-    }
-    render(<RatingsBar ratings={ratings} />)
-    expect(screen.getByText("340 votes")).toBeInTheDocument()
+    expect(screen.queryByText(/votes/)).not.toBeInTheDocument()
   })
 })
