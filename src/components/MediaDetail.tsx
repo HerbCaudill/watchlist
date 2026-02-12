@@ -40,6 +40,29 @@ export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: 
             )}
           </div>
 
+          {/* Action button */}
+          {onAction && (
+            <button
+              aria-label={isOnWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+              onClick={() => onAction(item)}
+              className={cx(
+                "flex w-fit items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors",
+                isOnWatchlist ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700",
+              )}
+            >
+              {isOnWatchlist ?
+                <>
+                  <IconMinus size={16} stroke={2.5} />
+                  Remove from watchlist
+                </>
+              : <>
+                  <IconPlus size={16} stroke={2.5} />
+                  Add to watchlist
+                </>
+              }
+            </button>
+          )}
+
           {/* Overview */}
           {item.overview && <p className="text-muted-foreground text-sm">{item.overview}</p>}
 
@@ -62,29 +85,6 @@ export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           />
         </div>
-      )}
-
-      {/* Action button */}
-      {onAction && (
-        <button
-          aria-label={isOnWatchlist ? "Remove from watchlist" : "Add to watchlist"}
-          onClick={() => onAction(item)}
-          className={cx(
-            "mt-6 flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors",
-            isOnWatchlist ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700",
-          )}
-        >
-          {isOnWatchlist ?
-            <>
-              <IconMinus size={16} stroke={2.5} />
-              Remove from watchlist
-            </>
-          : <>
-              <IconPlus size={16} stroke={2.5} />
-              Add to watchlist
-            </>
-          }
-        </button>
       )}
     </div>
   )

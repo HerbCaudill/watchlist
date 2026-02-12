@@ -169,5 +169,28 @@ describe("MediaDetail", () => {
         screen.queryByRole("button", { name: /remove from watchlist/i }),
       ).not.toBeInTheDocument()
     })
+
+    it("renders the action button before the trailer section", () => {
+      const itemWithTrailer: MediaItem = { ...movieFixture, trailerKey: "SUXWAEX2jlg" }
+      const { container } = render(
+        <MediaDetail item={itemWithTrailer} isOnWatchlist={false} onAction={() => {}} />,
+      )
+      const actionButton = screen.getByRole("button", { name: /add to watchlist/i })
+      const trailer = container.querySelector("iframe[title='Trailer']")!
+      // The action button should come before the trailer in DOM order
+      expect(
+        actionButton.compareDocumentPosition(trailer) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    })
+
+    it("renders the action button before the overview text", () => {
+      render(<MediaDetail item={movieFixture} isOnWatchlist={false} onAction={() => {}} />)
+      const actionButton = screen.getByRole("button", { name: /add to watchlist/i })
+      const overview = screen.getByText(movieFixture.overview!)
+      // The action button should come before the overview in DOM order
+      expect(
+        actionButton.compareDocumentPosition(overview) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    })
   })
 })
