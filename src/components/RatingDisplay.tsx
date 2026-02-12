@@ -8,7 +8,7 @@ export function RatingDisplay({ label, value, score, subtext }: Props) {
         <span>{label}</span>
         {subtext && <span className="text-muted-foreground text-xs">{subtext}</span>}
       </div>
-      <div className="flex items-center gap-2 text-lg font-semibold">
+      <div data-score-value className="flex items-center gap-2 text-sm font-semibold">
         <span data-score-indicator className={cn("h-3 w-3 rounded-full", getScoreColor(score))} />
         {value}
       </div>

@@ -36,4 +36,11 @@ describe("RatingDisplay", () => {
     const indicator = container.querySelector("[data-score-indicator]")
     expect(indicator).toHaveClass("bg-red-600")
   })
+
+  it("uses text-sm for the score value to keep it visually understated", () => {
+    const { container } = render(<RatingDisplay label="IMDb" value="8.5/10" score={85} />)
+    const scoreRow = container.querySelector("[data-score-value]")
+    expect(scoreRow).toHaveClass("text-sm")
+    expect(scoreRow).not.toHaveClass("text-lg")
+  })
 })
