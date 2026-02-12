@@ -107,8 +107,7 @@ export function SearchCombobox({
           placeholder="Search movies & TV shows..."
           className={cx(
             "border-input bg-background h-10 w-full rounded-md border py-2 pl-10 text-sm",
-            "placeholder:text-muted-foreground",
-            "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
+            "placeholder:text-muted-foreground focus-visible:outline-none",
             query ? "pr-10" : "pr-3",
           )}
         />

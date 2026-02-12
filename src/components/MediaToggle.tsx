@@ -5,7 +5,7 @@ import type { MediaType } from "@/types"
 /** Toggle between Movies and TV shows media types. Shows icons only on mobile, icons + labels on larger screens. */
 export function MediaToggle({ value, onChange }: Props) {
   return (
-    <div className="bg-muted inline-flex items-center gap-1 rounded-lg p-1" role="group">
+    <div className="inline-flex items-center gap-1 rounded-lg p-1" role="group">
       <ToggleButton
         icon={<IconMovie size={16} stroke={1.5} />}
         label="Movies"
@@ -48,9 +48,7 @@ function ToggleButton({
       }}
       className={cx(
         "flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
-        isActive ?
-          "bg-background text-foreground shadow-sm"
-        : "text-muted-foreground hover:text-foreground",
+        isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
       )}
     >
       {icon}
