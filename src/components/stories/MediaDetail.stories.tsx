@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import {
   movieFixture,
+  movieWithTrailerFixture,
   tvShowFixture,
   noPosterFixture,
   noRatingsFixture,
@@ -30,6 +31,16 @@ export const Movie: Story = {
 export const TvShow: Story = {
   args: {
     item: tvShowFixture,
+    isOnWatchlist: false,
+    onAction: () => {},
+    onClose: () => {},
+  },
+}
+
+/** Detail view with an embedded YouTube trailer. */
+export const WithTrailer: Story = {
+  args: {
+    item: movieWithTrailerFixture,
     isOnWatchlist: false,
     onAction: () => {},
     onClose: () => {},

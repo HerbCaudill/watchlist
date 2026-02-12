@@ -1,4 +1,4 @@
-import { IconMinus, IconPlus, IconX } from "@tabler/icons-react"
+import { IconArrowLeft, IconMinus, IconPlus } from "@tabler/icons-react"
 import { PosterImage } from "@/components/PosterImage"
 import { RatingsBar } from "@/components/RatingsBar"
 import { ScoreBadge } from "@/components/ScoreBadge"
@@ -9,17 +9,17 @@ import type { MediaItem } from "@/types"
 export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: Props) {
   return (
     <div className="relative max-w-3xl">
-      {/* Close button */}
+      {/* Back button */}
       {onClose && (
         <button
-          aria-label="Close"
+          aria-label="Back"
           onClick={onClose}
           className={cx(
             "absolute top-0 right-0 flex h-8 w-8 items-center justify-center rounded-full",
             "text-muted-foreground hover:bg-muted transition-colors",
           )}
         >
-          <IconX size={20} stroke={2} />
+          <IconArrowLeft size={20} stroke={2} />
         </button>
       )}
 
@@ -51,10 +51,18 @@ export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: 
         </div>
       </div>
 
-      {/* Trailer placeholder */}
-      <div className="bg-muted mt-6 flex aspect-video w-full items-center justify-center rounded-lg">
-        <span className="text-muted-foreground text-sm">Trailer</span>
-      </div>
+      {/* Trailer */}
+      {item.trailerKey && (
+        <div className="mt-6 aspect-video w-full overflow-hidden rounded-lg">
+          <iframe
+            title="Trailer"
+            src={`https://www.youtube.com/embed/${item.trailerKey}`}
+            className="h-full w-full"
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          />
+        </div>
+      )}
 
       {/* Action button */}
       {onAction && (
@@ -90,6 +98,6 @@ type Props = {
   isOnWatchlist?: boolean
   /** Callback when the action button is clicked. Button is hidden when not provided. */
   onAction?: (item: MediaItem) => void
-  /** Callback when the close button is clicked. Button is hidden when not provided. */
+  /** Callback when the back button is clicked. Button is hidden when not provided. */
   onClose?: () => void
 }

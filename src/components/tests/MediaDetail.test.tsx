@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 import { movieFixture, noRatingsFixture, noPosterFixture } from "@/lib/fixtures"
+import type { MediaItem } from "@/types"
 import { MediaDetail } from "../MediaDetail"
 
 describe("MediaDetail", () => {
@@ -72,28 +73,72 @@ describe("MediaDetail", () => {
     expect(screen.getByText("IMDb")).toBeInTheDocument()
   })
 
-  it("renders the trailer placeholder", () => {
-    render(<MediaDetail item={movieFixture} />)
-    expect(screen.getByText("Trailer")).toBeInTheDocument()
-  })
+  describe("trailer section", () => {
+    const itemWithTrailer: MediaItem = {
+      ...movieFixture,
+      trailerKey: "SUXWAEX2jlg",
+    }
 
-  describe("close button", () => {
-    it("renders a close button", () => {
-      render(<MediaDetail item={movieFixture} onClose={() => {}} />)
-      expect(screen.getByRole("button", { name: /close/i })).toBeInTheDocument()
+    it("renders a YouTube iframe when trailerKey is present", () => {
+      render(<MediaDetail item={itemWithTrailer} />)
+      const iframe = screen.getByTitle("Trailer")
+      expect(iframe).toBeInTheDocument()
+      expect(iframe.tagName).toBe("IFRAME")
     })
 
-    it("calls onClose when the close button is clicked", async () => {
+    it("sets the correct YouTube embed URL from trailerKey", () => {
+      render(<MediaDetail item={itemWithTrailer} />)
+      const iframe = screen.getByTitle("Trailer") as HTMLIFrameElement
+      expect(iframe.src).toBe("https://www.youtube.com/embed/SUXWAEX2jlg")
+    })
+
+    it("sets allowFullScreen on the iframe", () => {
+      render(<MediaDetail item={itemWithTrailer} />)
+      const iframe = screen.getByTitle("Trailer") as HTMLIFrameElement
+      expect(iframe.allowFullscreen).toBe(true)
+    })
+
+    it("has a 16:9 aspect ratio container", () => {
+      const { container } = render(<MediaDetail item={itemWithTrailer} />)
+      const wrapper = container.querySelector(".aspect-video")
+      expect(wrapper).toBeInTheDocument()
+    })
+
+    it("does not render an iframe when trailerKey is undefined", () => {
+      render(<MediaDetail item={movieFixture} />)
+      expect(screen.queryByTitle("Trailer")).not.toBeInTheDocument()
+    })
+
+    it("does not render an iframe when trailerKey is null", () => {
+      const itemWithNullTrailer: MediaItem = { ...movieFixture, trailerKey: null }
+      render(<MediaDetail item={itemWithNullTrailer} />)
+      expect(screen.queryByTitle("Trailer")).not.toBeInTheDocument()
+    })
+
+    it("does not render the trailer section at all when trailerKey is absent", () => {
+      const { container } = render(<MediaDetail item={movieFixture} />)
+      // No aspect-video container should be present
+      expect(container.querySelector(".aspect-video")).not.toBeInTheDocument()
+    })
+  })
+
+  describe("back button", () => {
+    it("renders a back button", () => {
+      render(<MediaDetail item={movieFixture} onClose={() => {}} />)
+      expect(screen.getByRole("button", { name: /back/i })).toBeInTheDocument()
+    })
+
+    it("calls onClose when the back button is clicked", async () => {
       const user = userEvent.setup()
       const onClose = vi.fn()
       render(<MediaDetail item={movieFixture} onClose={onClose} />)
-      await user.click(screen.getByRole("button", { name: /close/i }))
+      await user.click(screen.getByRole("button", { name: /back/i }))
       expect(onClose).toHaveBeenCalledOnce()
     })
 
-    it("does not render the close button when onClose is not provided", () => {
+    it("does not render the back button when onClose is not provided", () => {
       render(<MediaDetail item={movieFixture} />)
-      expect(screen.queryByRole("button", { name: /close/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole("button", { name: /back/i })).not.toBeInTheDocument()
     })
   })
 

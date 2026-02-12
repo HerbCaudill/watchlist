@@ -18,6 +18,13 @@ export const movieFixture: MediaItem = {
   normalizedScore: 82,
 }
 
+/** A movie with a YouTube trailer key for testing trailer embed. */
+export const movieWithTrailerFixture: MediaItem = {
+  ...movieFixture,
+  id: "movie-550-trailer",
+  trailerKey: "SUXWAEX2jlg",
+}
+
 /** A typical TV show with full ratings and metadata. */
 export const tvShowFixture: MediaItem = {
   id: "tv-1396",
