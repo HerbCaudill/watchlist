@@ -48,7 +48,7 @@ function ToggleButton({
       }}
       className={cx(
         "flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium transition-colors",
-        isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+        isActive ? "text-foreground bg-white shadow-sm" : "text-white/70 hover:text-white",
       )}
     >
       {icon}
