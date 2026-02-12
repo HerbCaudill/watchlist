@@ -17,9 +17,10 @@ export function Layout() {
   /** Derive mediaType from URL param (URL uses "movies", internal type uses "movie"). */
   const mediaType: MediaType = mediaTypeParam === "tv" ? "tv" : "movie"
 
-  /** Derive the active tab from the current path segment. */
+  /** Derive the active tab and detail-view state from the current path segment. */
   const pathSegments = location.pathname.split("/")
   const lastSegment = pathSegments[2] ?? "discover"
+  const isDetailView = lastSegment !== "discover" && lastSegment !== "watchlist"
   const activeTab: Tab = lastSegment === "watchlist" ? "watchlist" : "discover"
 
   const { query, setQuery, search, movieResults, tvResults, isLoading, clear } = useSearch()
@@ -86,6 +87,7 @@ export function Layout() {
       }
       activeTab={activeTab}
       onTabChange={handleTabChange}
+      showTabs={!isDetailView}
       mediaType={mediaType}
       onMediaTypeChange={handleMediaTypeChange}
     >

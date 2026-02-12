@@ -332,6 +332,39 @@ test.describe("routing", () => {
   })
 })
 
+test.describe("detail view", () => {
+  test("hides the tab bar when viewing a detail page", async ({ page }) => {
+    await mockApis(page)
+    await page.goto("/movies/550")
+    await expect(page.getByRole("heading", { name: "Fight Club" })).toBeVisible({ timeout: 30000 })
+
+    // Tab bar should not be visible on the detail page
+    await expect(page.getByRole("tablist")).not.toBeVisible()
+  })
+
+  test("shows a back button instead of a close button on the detail page", async ({ page }) => {
+    await mockApis(page)
+    await page.goto("/movies/550")
+    await expect(page.getByRole("heading", { name: "Fight Club" })).toBeVisible({ timeout: 30000 })
+
+    // Should have a back button, not a close button
+    await expect(page.getByLabel("Back")).toBeVisible()
+  })
+
+  test("back button navigates away from the detail page and restores tabs", async ({ page }) => {
+    await mockApis(page)
+    await page.goto("/movies/550")
+    await expect(page.getByRole("heading", { name: "Fight Club" })).toBeVisible({ timeout: 30000 })
+
+    // Click back
+    await page.getByLabel("Back").click()
+
+    // Tab bar should be visible again
+    await expect(page.getByRole("tablist")).toBeVisible()
+    await expect(page).toHaveURL(/\/movies\/discover/)
+  })
+})
+
 test.describe("add to watchlist", () => {
   test("add a search result to the watchlist, then see it on the Watchlist tab", async ({
     page,
@@ -352,10 +385,14 @@ test.describe("add to watchlist", () => {
     // Should navigate to the detail page
     await expect(page.getByRole("heading", { name: "Fight Club" })).toBeVisible()
 
+    // Tab bar should be hidden on the detail page
+    await expect(page.getByRole("tablist")).not.toBeVisible()
+
     // Click "Add to watchlist" on the detail page
     await page.getByLabel("Add to watchlist").click()
 
-    // Switch to Watchlist tab to verify the item was added
+    // Navigate back from the detail page, then switch to the Watchlist tab
+    await page.getByLabel("Back").click()
     await page.getByRole("tab", { name: "Watchlist" }).click()
     await expect(page.getByText("Fight Club").first()).toBeVisible()
     await expect(page.getByText("Your watchlist is empty")).not.toBeVisible()

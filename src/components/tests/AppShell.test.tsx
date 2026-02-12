@@ -84,4 +84,44 @@ describe("AppShell", () => {
     await userEvent.click(tvButton)
     expect(onMediaTypeChange).toHaveBeenCalledWith("tv")
   })
+
+  describe("showTabs prop", () => {
+    it("shows the tab bar by default", () => {
+      render(<AppShell {...defaultProps}>content</AppShell>)
+      expect(screen.getByRole("tablist")).toBeInTheDocument()
+    })
+
+    it("shows the tab bar when showTabs is true", () => {
+      render(
+        <AppShell {...defaultProps} showTabs={true}>
+          content
+        </AppShell>,
+      )
+      expect(screen.getByRole("tablist")).toBeInTheDocument()
+    })
+
+    it("hides the tab bar when showTabs is false", () => {
+      render(
+        <AppShell {...defaultProps} showTabs={false}>
+          content
+        </AppShell>,
+      )
+      expect(screen.queryByRole("tablist")).not.toBeInTheDocument()
+    })
+
+    it("renders without activeTab and onTabChange when showTabs is false", () => {
+      render(
+        <AppShell
+          searchSlot={<input role="searchbox" placeholder="Search..." />}
+          mediaType="movie"
+          onMediaTypeChange={vi.fn()}
+          showTabs={false}
+        >
+          content
+        </AppShell>,
+      )
+      expect(screen.queryByRole("tablist")).not.toBeInTheDocument()
+      expect(screen.getByText("content")).toBeInTheDocument()
+    })
+  })
 })

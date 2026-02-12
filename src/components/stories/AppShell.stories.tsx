@@ -13,7 +13,13 @@ export default meta
 type Story = StoryObj<typeof AppShell>
 
 /** Wrapper that manages all controlled state so the story is interactive. */
-function AppShellDemo({ initialTab = "discover" }: { initialTab?: Tab }) {
+function AppShellDemo({
+  initialTab = "discover",
+  showTabs = true,
+}: {
+  initialTab?: Tab
+  showTabs?: boolean
+}) {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [mediaType, setMediaType] = useState<MediaType>("movie")
 
@@ -27,6 +33,7 @@ function AppShellDemo({ initialTab = "discover" }: { initialTab?: Tab }) {
       }
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      showTabs={showTabs}
       mediaType={mediaType}
       onMediaTypeChange={setMediaType}
     >
@@ -45,4 +52,9 @@ export const Default: Story = {
 /** App shell with the Watchlist tab active. */
 export const WatchlistTab: Story = {
   render: () => <AppShellDemo initialTab="watchlist" />,
+}
+
+/** App shell with tabs hidden, as shown on the detail view. */
+export const NoTabs: Story = {
+  render: () => <AppShellDemo showTabs={false} />,
 }

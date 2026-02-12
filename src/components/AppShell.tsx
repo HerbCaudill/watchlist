@@ -9,6 +9,7 @@ export function AppShell({
   onTabChange,
   mediaType,
   onMediaTypeChange,
+  showTabs = true,
   children,
 }: Props) {
   return (
@@ -18,9 +19,11 @@ export function AppShell({
         <MediaToggle value={mediaType} onChange={onMediaTypeChange} />
       </div>
       <div className="flex flex-1 flex-col rounded-t-xl bg-white">
-        <header className="px-4 pt-4">
-          <TabBar activeTab={activeTab} onTabChange={onTabChange} />
-        </header>
+        {showTabs && activeTab && onTabChange && (
+          <header className="px-4 pt-4">
+            <TabBar activeTab={activeTab} onTabChange={onTabChange} />
+          </header>
+        )}
         <main className="flex-1 px-4 py-4">{children}</main>
       </div>
     </div>
@@ -31,14 +34,16 @@ export function AppShell({
 type Props = {
   /** The search UI rendered at the top of the shell. */
   searchSlot: React.ReactNode
-  /** The currently active tab. */
-  activeTab: Tab
-  /** Called when the user switches tabs. */
-  onTabChange: (tab: Tab) => void
+  /** The currently active tab. Optional when showTabs is false. */
+  activeTab?: Tab
+  /** Called when the user switches tabs. Optional when showTabs is false. */
+  onTabChange?: (tab: Tab) => void
   /** The currently selected media type. */
   mediaType: MediaType
   /** Called when the user toggles the media type. */
   onMediaTypeChange: (mediaType: MediaType) => void
+  /** Whether to show the tab bar. Defaults to true. */
+  showTabs?: boolean
   /** The content to render in the main area below the header. */
   children: React.ReactNode
 }
