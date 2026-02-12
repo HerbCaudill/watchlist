@@ -66,6 +66,18 @@ const mockOmdbResponse = {
 }
 
 /**
+ * Mock TMDB movie detail response for direct URL access.
+ */
+const mockTmdbMovieDetailResponse = {
+  id: 550,
+  title: "Fight Club",
+  release_date: "1999-10-15",
+  poster_path: "/pB8BM7pdSp6B6Ih7QI4S2t0POoT.jpg",
+  overview:
+    "An insomniac office worker and a devil-may-care soap maker form an underground fight club.",
+}
+
+/**
  * Mock TMDB videos/trailer response.
  */
 const mockTmdbTrailerResponse = {
@@ -98,6 +110,11 @@ async function mockApis(page: Page) {
   // Mock TMDB trailer/videos endpoint
   await page.route("**/api.themoviedb.org/3/**/videos**", async route => {
     await route.fulfill({ json: mockTmdbTrailerResponse })
+  })
+
+  // Mock TMDB movie detail endpoint (registered after videos to avoid conflicts)
+  await page.route("**/api.themoviedb.org/3/movie/**", async route => {
+    await route.fulfill({ json: mockTmdbMovieDetailResponse })
   })
 
   // Mock OMDB
@@ -176,7 +193,7 @@ test.describe("media toggle", () => {
   test("switches from Movies to TV shows", async ({ page }) => {
     await page.goto("/")
     const moviesButton = page.getByRole("button", { name: "Movies" })
-    const tvButton = page.getByRole("button", { name: "TV shows" })
+    const tvButton = page.getByRole("button", { name: "TV" })
 
     await expect(moviesButton).toHaveAttribute("aria-pressed", "true", { timeout: 30000 })
     await expect(tvButton).toHaveAttribute("aria-pressed", "false")
@@ -189,7 +206,7 @@ test.describe("media toggle", () => {
   test("switches back from TV shows to Movies", async ({ page }) => {
     await page.goto("/")
     const moviesButton = page.getByRole("button", { name: "Movies" })
-    const tvButton = page.getByRole("button", { name: "TV shows" })
+    const tvButton = page.getByRole("button", { name: "TV" })
 
     await expect(moviesButton).toHaveAttribute("aria-pressed", "true", { timeout: 30000 })
 
@@ -212,25 +229,18 @@ test.describe("search flow", () => {
     await searchInput.fill("Fight Club")
     await searchInput.press("Enter")
 
-    // Should show movie results from our mock
+    // Should show movie results from our mock in the dropdown
     await expect(page.getByText("Fight Club")).toBeVisible()
     await expect(page.getByText("The Matrix")).toBeVisible()
-
-    // "Coming soon" should no longer be visible
-    await expect(page.getByText("Coming soon")).not.toBeVisible()
   })
 
   test("searching for TV shows shows results", async ({ page }) => {
     await mockApis(page)
-    await page.goto("/")
+    await page.goto("/tv/discover")
     await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
-
-    // Switch to TV shows first
-    await page.getByRole("button", { name: "TV shows" }).click()
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
     await searchInput.fill("Breaking Bad")
-    await searchInput.press("Enter")
 
     await expect(page.getByText("Breaking Bad")).toBeVisible()
   })
@@ -272,6 +282,56 @@ test.describe("search flow", () => {
   })
 })
 
+test.describe("routing", () => {
+  test("redirects / to /movies/discover", async ({ page }) => {
+    await page.goto("/")
+    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page).toHaveURL(/\/movies\/discover/)
+  })
+
+  test("tab switching updates the URL", async ({ page }) => {
+    await page.goto("/")
+    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+
+    await page.getByRole("tab", { name: "Watchlist" }).click()
+    await expect(page).toHaveURL(/\/movies\/watchlist/)
+
+    await page.getByRole("tab", { name: "Discover" }).click()
+    await expect(page).toHaveURL(/\/movies\/discover/)
+  })
+
+  test("media toggle updates the URL", async ({ page }) => {
+    await page.goto("/")
+    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+
+    await page.getByRole("button", { name: "TV" }).click()
+    await expect(page).toHaveURL(/\/tv\/discover/)
+
+    await page.getByRole("button", { name: "Movies" }).click()
+    await expect(page).toHaveURL(/\/movies\/discover/)
+  })
+
+  test("direct URL access to /tv/watchlist works", async ({ page }) => {
+    await page.goto("/tv/watchlist")
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
+
+    const tvButton = page.getByRole("button", { name: "TV" })
+    await expect(tvButton).toHaveAttribute("aria-pressed", "true")
+  })
+
+  test("back button navigates between routes", async ({ page }) => {
+    await page.goto("/movies/discover")
+    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+
+    await page.getByRole("tab", { name: "Watchlist" }).click()
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible()
+
+    await page.goBack()
+    await expect(page.getByText("Coming soon")).toBeVisible()
+    await expect(page).toHaveURL(/\/movies\/discover/)
+  })
+})
+
 test.describe("add to watchlist", () => {
   test("add a search result to the watchlist, then see it on the Watchlist tab", async ({
     page,
@@ -283,16 +343,21 @@ test.describe("add to watchlist", () => {
     // Search for movies
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
     await searchInput.fill("Fight Club")
-    await searchInput.press("Enter")
-    await expect(page.getByText("Fight Club")).toBeVisible()
 
-    // Hover over the first card to reveal the action button, then click "Add to watchlist"
-    const addButton = page.getByLabel("Add to watchlist").first()
-    await addButton.click({ force: true })
+    // Wait for search results to appear in the dropdown, then click the first result
+    const fightClubResult = page.locator("[cmdk-item]").filter({ hasText: "Fight Club" })
+    await expect(fightClubResult).toBeVisible()
+    await fightClubResult.click()
+
+    // Should navigate to the detail page
+    await expect(page.getByRole("heading", { name: "Fight Club" })).toBeVisible()
+
+    // Click "Add to watchlist" on the detail page
+    await page.getByLabel("Add to watchlist").click()
 
     // Switch to Watchlist tab to verify the item was added
     await page.getByRole("tab", { name: "Watchlist" }).click()
-    await expect(page.getByText("Fight Club")).toBeVisible()
+    await expect(page.getByText("Fight Club").first()).toBeVisible()
     await expect(page.getByText("Your watchlist is empty")).not.toBeVisible()
   })
 })
