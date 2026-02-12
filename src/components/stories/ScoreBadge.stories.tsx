@@ -6,7 +6,7 @@ const meta: Meta<typeof ScoreBadge> = {
   component: ScoreBadge,
   argTypes: {
     score: { control: { type: "range", min: 0, max: 100 } },
-    size: { control: "select", options: ["sm", "md"] },
+    size: { control: "select", options: ["sm", "md", "lg"] },
   },
 }
 
@@ -48,12 +48,18 @@ export const AllVariants: Story = {
   ),
 }
 
-/** Both sizes compared. */
+/** Large size variant. */
+export const LargeSize: Story = {
+  args: { score: 90, size: "lg" },
+}
+
+/** All three sizes compared. */
 export const SizeComparison: Story = {
   render: () => (
     <div className="flex items-center gap-3">
       <ScoreBadge score={85} size="sm" />
       <ScoreBadge score={85} size="md" />
+      <ScoreBadge score={85} size="lg" />
     </div>
   ),
 }

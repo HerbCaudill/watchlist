@@ -3,19 +3,20 @@ import { describe, expect, it } from "vitest"
 import { ScoreBadge } from "../ScoreBadge"
 
 describe("ScoreBadge", () => {
-  it("renders the score as a percentage", () => {
+  it("renders the score without a percent sign", () => {
     render(<ScoreBadge score={85} />)
-    expect(screen.getByText("85%")).toBeInTheDocument()
+    expect(screen.getByText("85")).toBeInTheDocument()
+    expect(screen.queryByText("85%")).not.toBeInTheDocument()
   })
 
   it("renders a score of 0", () => {
     render(<ScoreBadge score={0} />)
-    expect(screen.getByText("0%")).toBeInTheDocument()
+    expect(screen.getByText("0")).toBeInTheDocument()
   })
 
   it("renders a score of 100", () => {
     render(<ScoreBadge score={100} />)
-    expect(screen.getByText("100%")).toBeInTheDocument()
+    expect(screen.getByText("100")).toBeInTheDocument()
   })
 
   describe("color coding", () => {
@@ -73,6 +74,12 @@ describe("ScoreBadge", () => {
       const { container } = render(<ScoreBadge score={75} size="md" />)
       const badge = container.firstChild as HTMLElement
       expect(badge.className).toMatch(/text-sm/)
+    })
+
+    it("renders lg size", () => {
+      const { container } = render(<ScoreBadge score={75} size="lg" />)
+      const badge = container.firstChild as HTMLElement
+      expect(badge.className).toMatch(/text-3xl/)
     })
   })
 })

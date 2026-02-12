@@ -40,14 +40,14 @@ export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: 
             )}
           </div>
 
-          {/* Score badge */}
-          {item.normalizedScore != null && <ScoreBadge score={item.normalizedScore} />}
-
           {/* Overview */}
           {item.overview && <p className="text-muted-foreground text-sm">{item.overview}</p>}
 
-          {/* Ratings bar */}
-          <RatingsBar ratings={item.ratings} />
+          {/* Score and ratings row */}
+          <div data-testid="ratings-row" className="flex items-center gap-4">
+            {item.normalizedScore != null && <ScoreBadge score={item.normalizedScore} size="lg" />}
+            <RatingsBar ratings={item.ratings} />
+          </div>
         </div>
       </div>
 

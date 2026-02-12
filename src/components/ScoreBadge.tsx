@@ -7,17 +7,22 @@ export const ScoreBadge = ({ score, size = "md" }: Props) => {
     : score >= 50 ? "bg-yellow-500"
     : "bg-red-600"
 
-  const sizeClass = size === "sm" ? "px-1.5 py-0.5 text-xs" : "px-2 py-0.5 text-sm"
+  const sizeClasses: Record<Props["size"] & string, string> = {
+    sm: "px-1.5 py-0.5 text-xs",
+    md: "px-2 py-0.5 text-sm",
+    lg: "px-3 py-1.5 text-3xl",
+  }
 
   return (
     <span
+      data-testid="score-badge"
       className={cn(
         "inline-flex items-center rounded-md font-bold text-white shadow-sm",
         color,
-        sizeClass,
+        sizeClasses[size],
       )}
     >
-      {score}%
+      {score}
     </span>
   )
 }
@@ -27,5 +32,5 @@ type Props = {
   /** Numeric score from 0 to 100. */
   score: number
   /** Badge size variant. */
-  size?: "sm" | "md"
+  size?: "sm" | "md" | "lg"
 }

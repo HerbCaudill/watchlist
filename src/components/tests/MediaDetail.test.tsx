@@ -45,12 +45,24 @@ describe("MediaDetail", () => {
 
   it("renders the score badge when normalizedScore is present", () => {
     render(<MediaDetail item={movieFixture} />)
-    expect(screen.getByText("82%")).toBeInTheDocument()
+    expect(screen.getByText("82")).toBeInTheDocument()
   })
 
   it("does not render the score badge when normalizedScore is null", () => {
     render(<MediaDetail item={noRatingsFixture} />)
-    expect(screen.queryByText("%")).not.toBeInTheDocument()
+    // The score badge should not be present at all
+    const badges = screen.queryAllByText(/^\d+$/)
+    // There should be no standalone number badges (the ratings bar has its own format)
+    expect(badges.filter(el => el.closest("[data-testid='score-badge']"))).toHaveLength(0)
+  })
+
+  it("renders the score badge and ratings bar in the same row", () => {
+    const { container } = render(<MediaDetail item={movieFixture} />)
+    const ratingsRow = container.querySelector("[data-testid='ratings-row']")
+    expect(ratingsRow).toBeInTheDocument()
+    // The row should contain both the score badge and the ratings bar
+    expect(ratingsRow!.querySelector("[data-testid='score-badge']")).toBeInTheDocument()
+    expect(ratingsRow!.textContent).toContain("RT Critics")
   })
 
   it("renders ratings from the ratings bar", () => {

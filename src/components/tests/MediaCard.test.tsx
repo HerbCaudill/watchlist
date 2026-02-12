@@ -23,12 +23,12 @@ describe("MediaCard", () => {
 
   it("renders the score badge when normalizedScore is present", () => {
     render(<MediaCard item={movieFixture} />)
-    expect(screen.getByText("82%")).toBeInTheDocument()
+    expect(screen.getByText("82")).toBeInTheDocument()
   })
 
   it("does not render the score badge when normalizedScore is null", () => {
     render(<MediaCard item={noRatingsFixture} />)
-    expect(screen.queryByText("%")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("score-badge")).not.toBeInTheDocument()
   })
 
   it("renders a poster placeholder when posterUrl is undefined", () => {
