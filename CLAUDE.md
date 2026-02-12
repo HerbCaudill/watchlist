@@ -38,8 +38,9 @@ Run a single Playwright test: `pnpm test:pw e2e/foo.spec.ts`
 - **PWA** via `vite-plugin-pwa` with auto-update service worker
 - **Storybook 8** for component development and visual testing
 - **Vitest** (jsdom) for unit tests, **Playwright** for E2E
-- **Effect Schema** for API response decoding (planned)
-- **DXOS 0.8.3** for local-first persistence (ClientProvider wraps App in `main.tsx`)
+- **React Router v7** for URL-based routing
+- **Effect Schema** for API response decoding
+- **DXOS 0.8.3** for local-first persistence (ClientProvider wraps RouterProvider in `main.tsx`)
 
 ## Path alias
 
@@ -57,7 +58,21 @@ The app follows a phased implementation plan:
 
 Key types are in `src/types.ts`. Fixtures for stories/tests go in `src/lib/fixtures.ts`.
 
-Search UX: the `SearchCombobox` input in `App` autofocuses on initial render.
+### Routing
+
+URL-based routing via React Router v7 (`src/main.tsx`). Routes:
+
+```
+/                         → redirect to /movies/discover
+/:mediaType/discover      → discover view (DiscoverPage)
+/:mediaType/watchlist     → watchlist filtered by media type (WatchlistPage)
+/:mediaType/:tmdbId       → detail view for a specific item (DetailPage)
+```
+
+`mediaType` is `movies` or `tv` in the URL. The `Layout` component (`src/routes/Layout.tsx`)
+renders the shared chrome (search, toggle, tabs) and derives `mediaType`/`activeTab` from the URL.
+Search state (`useSearch`) lives in the Layout as ephemeral UI state. `DetailPage` accepts items
+via router state (instant) or fetches from TMDB API (for direct URL access/deep links).
 
 ## Environment variables
 
