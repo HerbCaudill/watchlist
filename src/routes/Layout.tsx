@@ -80,6 +80,7 @@ export function Layout() {
             const urlMediaType = item.mediaType === "movie" ? "movies" : "tv"
             navigate(`/${urlMediaType}/${item.tmdbId}`, { state: { item } })
           }}
+          onAdd={item => watchlist.add(item)}
           onClear={handleSearchClear}
         />
       }

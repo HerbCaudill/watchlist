@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Command as CommandPrimitive } from "cmdk"
-import { IconCheck, IconMovie, IconSearch, IconX } from "@tabler/icons-react"
+import { IconCheck, IconMovie, IconPlus, IconSearch, IconX } from "@tabler/icons-react"
 import { cx } from "@/lib/utils"
 import { ScoreBadge } from "@/components/ScoreBadge"
 import type { MediaItem } from "@/types"
@@ -13,6 +13,7 @@ export function SearchCombobox({
   isLoading,
   watchlistIds,
   onSelect,
+  onAdd,
   onClear,
 }: Props) {
   const [open, setOpen] = useState(false)
@@ -83,8 +84,27 @@ export function SearchCombobox({
           </div>
         </div>
 
-        {/* Right: checkmark if on watchlist */}
-        {onWatchlist && <IconCheck className="size-4 shrink-0 text-green-600" stroke={2} />}
+        {/* Right: checkmark if on watchlist, or add button if not */}
+        {onWatchlist ?
+          <IconCheck className="size-4 shrink-0 text-green-600" stroke={2} />
+        : onAdd && (
+            <button
+              type="button"
+              aria-label="Add to watchlist"
+              onMouseDown={e => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+              onClick={e => {
+                e.stopPropagation()
+                onAdd(item)
+              }}
+              className="text-muted-foreground hover:text-foreground flex size-6 shrink-0 items-center justify-center rounded-sm"
+            >
+              <IconPlus className="size-4" stroke={2} />
+            </button>
+          )
+        }
       </CommandPrimitive.Item>
     )
   }
@@ -159,6 +179,8 @@ type Props = {
   watchlistIds: Set<string>
   /** Called when the user selects an item to view its detail. */
   onSelect: (item: MediaItem) => void
+  /** Called when the user clicks the add-to-watchlist button on a result item. */
+  onAdd?: (item: MediaItem) => void
   /** Called when the user clears the search input. */
   onClear: () => void
 }
