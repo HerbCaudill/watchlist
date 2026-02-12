@@ -43,4 +43,11 @@ describe("TabBar", () => {
     render(<TabBar activeTab="discover" onTabChange={() => {}} />)
     expect(screen.getByRole("tablist")).toBeInTheDocument()
   })
+
+  it("renders Watchlist tab before Discover tab", () => {
+    render(<TabBar activeTab="watchlist" onTabChange={() => {}} />)
+    const tabs = screen.getAllByRole("tab")
+    expect(tabs[0]).toHaveTextContent("Watchlist")
+    expect(tabs[1]).toHaveTextContent("Discover")
+  })
 })

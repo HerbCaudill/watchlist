@@ -124,9 +124,9 @@ async function mockApis(page: Page) {
 }
 
 test.describe("initial state", () => {
-  test("shows the Discover tab with 'Coming soon' placeholder", async ({ page }) => {
+  test("shows the Watchlist tab with empty watchlist message", async ({ page }) => {
     await page.goto("/")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
   })
 
   test("shows the search bar with placeholder text", async ({ page }) => {
@@ -136,11 +136,11 @@ test.describe("initial state", () => {
     })
   })
 
-  test("shows Discover tab as active by default", async ({ page }) => {
+  test("shows Watchlist tab as active by default", async ({ page }) => {
     await page.goto("/")
-    const discoverTab = page.getByRole("tab", { name: "Discover" })
-    await expect(discoverTab).toBeVisible({ timeout: 30000 })
-    await expect(discoverTab).toHaveAttribute("aria-selected", "true")
+    const watchlistTab = page.getByRole("tab", { name: "Watchlist" })
+    await expect(watchlistTab).toBeVisible({ timeout: 30000 })
+    await expect(watchlistTab).toHaveAttribute("aria-selected", "true")
   })
 
   test("shows Movies toggle as active by default", async ({ page }) => {
@@ -152,27 +152,27 @@ test.describe("initial state", () => {
 })
 
 test.describe("tab switching", () => {
-  test("switches to Watchlist tab and shows empty message", async ({ page }) => {
+  test("switches to Discover tab and shows 'Coming soon' placeholder", async ({ page }) => {
     await page.goto("/")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
 
-    await page.getByRole("tab", { name: "Watchlist" }).click()
-    await expect(page.getByText("Your watchlist is empty")).toBeVisible()
-    await expect(page.getByText("Coming soon")).not.toBeVisible()
-  })
-
-  test("switches back to Discover tab from Watchlist", async ({ page }) => {
-    await page.goto("/")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
-
-    // Go to Watchlist
-    await page.getByRole("tab", { name: "Watchlist" }).click()
-    await expect(page.getByText("Your watchlist is empty")).toBeVisible()
-
-    // Go back to Discover
     await page.getByRole("tab", { name: "Discover" }).click()
     await expect(page.getByText("Coming soon")).toBeVisible()
     await expect(page.getByText("Your watchlist is empty")).not.toBeVisible()
+  })
+
+  test("switches back to Watchlist tab from Discover", async ({ page }) => {
+    await page.goto("/")
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
+
+    // Go to Discover
+    await page.getByRole("tab", { name: "Discover" }).click()
+    await expect(page.getByText("Coming soon")).toBeVisible()
+
+    // Go back to Watchlist
+    await page.getByRole("tab", { name: "Watchlist" }).click()
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible()
+    await expect(page.getByText("Coming soon")).not.toBeVisible()
   })
 
   test("tab aria-selected updates correctly on switch", async ({ page }) => {
@@ -180,12 +180,12 @@ test.describe("tab switching", () => {
     const discoverTab = page.getByRole("tab", { name: "Discover" })
     const watchlistTab = page.getByRole("tab", { name: "Watchlist" })
 
-    await expect(discoverTab).toHaveAttribute("aria-selected", "true", { timeout: 30000 })
-    await expect(watchlistTab).toHaveAttribute("aria-selected", "false")
-
-    await watchlistTab.click()
-    await expect(watchlistTab).toHaveAttribute("aria-selected", "true")
+    await expect(watchlistTab).toHaveAttribute("aria-selected", "true", { timeout: 30000 })
     await expect(discoverTab).toHaveAttribute("aria-selected", "false")
+
+    await discoverTab.click()
+    await expect(discoverTab).toHaveAttribute("aria-selected", "true")
+    await expect(watchlistTab).toHaveAttribute("aria-selected", "false")
   })
 })
 
@@ -217,12 +217,23 @@ test.describe("media toggle", () => {
     await expect(moviesButton).toHaveAttribute("aria-pressed", "true")
     await expect(tvButton).toHaveAttribute("aria-pressed", "false")
   })
+
+  test("media toggle preserves the active tab in the URL", async ({ page }) => {
+    await page.goto("/")
+    await expect(page).toHaveURL(/\/movies\/watchlist/, { timeout: 30000 })
+
+    await page.getByRole("button", { name: "TV" }).click()
+    await expect(page).toHaveURL(/\/tv\/watchlist/)
+
+    await page.getByRole("button", { name: "Movies" }).click()
+    await expect(page).toHaveURL(/\/movies\/watchlist/)
+  })
 })
 
 test.describe("search flow", () => {
   test("searching for movies shows results", async ({ page }) => {
     await mockApis(page)
-    await page.goto("/")
+    await page.goto("/movies/discover")
     await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
@@ -247,7 +258,7 @@ test.describe("search flow", () => {
 
   test("clearing the search returns to the discover placeholder", async ({ page }) => {
     await mockApis(page)
-    await page.goto("/")
+    await page.goto("/movies/discover")
     await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
@@ -271,7 +282,7 @@ test.describe("search flow", () => {
       })
     })
 
-    await page.goto("/")
+    await page.goto("/movies/discover")
     await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
@@ -283,32 +294,32 @@ test.describe("search flow", () => {
 })
 
 test.describe("routing", () => {
-  test("redirects / to /movies/discover", async ({ page }) => {
+  test("redirects / to /movies/watchlist", async ({ page }) => {
     await page.goto("/")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
-    await expect(page).toHaveURL(/\/movies\/discover/)
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
+    await expect(page).toHaveURL(/\/movies\/watchlist/)
   })
 
   test("tab switching updates the URL", async ({ page }) => {
     await page.goto("/")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
-
-    await page.getByRole("tab", { name: "Watchlist" }).click()
-    await expect(page).toHaveURL(/\/movies\/watchlist/)
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
 
     await page.getByRole("tab", { name: "Discover" }).click()
     await expect(page).toHaveURL(/\/movies\/discover/)
+
+    await page.getByRole("tab", { name: "Watchlist" }).click()
+    await expect(page).toHaveURL(/\/movies\/watchlist/)
   })
 
   test("media toggle updates the URL", async ({ page }) => {
     await page.goto("/")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
 
     await page.getByRole("button", { name: "TV" }).click()
-    await expect(page).toHaveURL(/\/tv\/discover/)
+    await expect(page).toHaveURL(/\/tv\/watchlist/)
 
     await page.getByRole("button", { name: "Movies" }).click()
-    await expect(page).toHaveURL(/\/movies\/discover/)
+    await expect(page).toHaveURL(/\/movies\/watchlist/)
   })
 
   test("direct URL access to /tv/watchlist works", async ({ page }) => {
@@ -320,15 +331,15 @@ test.describe("routing", () => {
   })
 
   test("back button navigates between routes", async ({ page }) => {
-    await page.goto("/movies/discover")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await page.goto("/movies/watchlist")
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
 
-    await page.getByRole("tab", { name: "Watchlist" }).click()
-    await expect(page.getByText("Your watchlist is empty")).toBeVisible()
+    await page.getByRole("tab", { name: "Discover" }).click()
+    await expect(page.getByText("Coming soon")).toBeVisible()
 
     await page.goBack()
-    await expect(page.getByText("Coming soon")).toBeVisible()
-    await expect(page).toHaveURL(/\/movies\/discover/)
+    await expect(page.getByText("Your watchlist is empty")).toBeVisible()
+    await expect(page).toHaveURL(/\/movies\/watchlist/)
   })
 })
 
@@ -361,7 +372,6 @@ test.describe("detail view", () => {
 
     // Tab bar should be visible again
     await expect(page.getByRole("tablist")).toBeVisible()
-    await expect(page).toHaveURL(/\/movies\/discover/)
   })
 })
 
@@ -370,7 +380,7 @@ test.describe("add to watchlist", () => {
     page,
   }) => {
     await mockApis(page)
-    await page.goto("/")
+    await page.goto("/movies/discover")
     await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
 
     // Search for movies

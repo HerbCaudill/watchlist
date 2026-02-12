@@ -19,7 +19,7 @@ export function Layout() {
 
   /** Derive the active tab and detail-view state from the current path segment. */
   const pathSegments = location.pathname.split("/")
-  const lastSegment = pathSegments[2] ?? "discover"
+  const lastSegment = pathSegments[2] ?? "watchlist"
   const isDetailView = lastSegment !== "discover" && lastSegment !== "watchlist"
   const activeTab: Tab = lastSegment === "watchlist" ? "watchlist" : "discover"
 

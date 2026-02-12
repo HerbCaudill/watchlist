@@ -14,7 +14,7 @@ import { WatchlistItem } from "@/schema/WatchlistItem"
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/movies/discover" replace />,
+    element: <Navigate to="/movies/watchlist" replace />,
   },
   {
     path: "/:mediaType",

@@ -63,7 +63,7 @@ Key types are in `src/types.ts`. Fixtures for stories/tests go in `src/lib/fixtu
 URL-based routing via React Router v7 (`src/main.tsx`). Routes:
 
 ```
-/                         → redirect to /movies/discover
+/                         → redirect to /movies/watchlist
 /:mediaType/discover      → discover view (DiscoverPage)
 /:mediaType/watchlist     → watchlist filtered by media type (WatchlistPage)
 /:mediaType/:tmdbId       → detail view for a specific item (DetailPage)

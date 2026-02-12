@@ -27,8 +27,8 @@ export function TabBar({ activeTab, onTabChange }: Props) {
 
 /** The available tabs with their display labels. */
 const tabs: { id: Tab; label: string }[] = [
-  { id: "discover", label: "Discover" },
   { id: "watchlist", label: "Watchlist" },
+  { id: "discover", label: "Discover" },
 ]
 
 /** Props for the TabBar component. */
