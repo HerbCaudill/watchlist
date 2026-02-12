@@ -8,20 +8,36 @@ import type { MediaItem } from "@/types"
 /** Full detail view for a movie or TV show, with poster, plot, ratings, trailer, and actions. */
 export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: Props) {
   return (
-    <div className="relative max-w-3xl">
-      {/* Back button */}
-      {onClose && (
-        <button
-          aria-label="Back"
-          onClick={onClose}
-          className={cx(
-            "absolute top-0 right-0 flex h-8 w-8 items-center justify-center rounded-full",
-            "text-muted-foreground hover:bg-muted transition-colors",
-          )}
-        >
-          <IconArrowLeft size={20} stroke={2} />
-        </button>
-      )}
+    <div className="max-w-3xl">
+      {/* Top bar: back button + action button */}
+      <div className="mb-4 flex items-center justify-between">
+        {onClose && (
+          <button
+            aria-label="Back"
+            onClick={onClose}
+            className={cx(
+              "flex h-8 w-8 items-center justify-center rounded-full",
+              "text-muted-foreground hover:bg-muted transition-colors",
+            )}
+          >
+            <IconArrowLeft size={20} stroke={2} />
+          </button>
+        )}
+        {onAction && (
+          <button
+            aria-label={isOnWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+            onClick={() => onAction(item)}
+            className={cx(
+              "flex h-8 w-8 items-center justify-center rounded-full text-white transition-colors",
+              isOnWatchlist ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700",
+            )}
+          >
+            {isOnWatchlist ?
+              <IconMinus size={18} stroke={2.5} />
+            : <IconPlus size={18} stroke={2.5} />}
+          </button>
+        )}
+      </div>
 
       {/* Header: poster + info side by side */}
       <div className="flex flex-col gap-6 sm:flex-row">
@@ -40,37 +56,14 @@ export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: 
             )}
           </div>
 
-          {/* Action button */}
-          {onAction && (
-            <button
-              aria-label={isOnWatchlist ? "Remove from watchlist" : "Add to watchlist"}
-              onClick={() => onAction(item)}
-              className={cx(
-                "flex w-fit items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors",
-                isOnWatchlist ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700",
-              )}
-            >
-              {isOnWatchlist ?
-                <>
-                  <IconMinus size={16} stroke={2.5} />
-                  Remove from watchlist
-                </>
-              : <>
-                  <IconPlus size={16} stroke={2.5} />
-                  Add to watchlist
-                </>
-              }
-            </button>
-          )}
-
-          {/* Overview */}
-          {item.overview && <p className="text-muted-foreground text-sm">{item.overview}</p>}
-
-          {/* Score and ratings row */}
+          {/* Score and ratings */}
           <div data-testid="ratings-row" className="flex items-center gap-4">
             {item.normalizedScore != null && <ScoreBadge score={item.normalizedScore} size="lg" />}
             <RatingsBar ratings={item.ratings} />
           </div>
+
+          {/* Overview */}
+          {item.overview && <p className="text-muted-foreground text-sm">{item.overview}</p>}
         </div>
       </div>
 
