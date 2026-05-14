@@ -1,12 +1,8 @@
-import { Schema } from "effect"
-import { OmdbResult } from "@/schema/OmdbResult"
+import { Effect } from "@/lib/effect"
+import { fetchOmdbDataEffect } from "@/lib/fetchOmdbDataEffect"
 import type { Ratings } from "@/types"
 
-/**
- * Fetch enrichment data from the OMDB API for a given title.
- * Decodes the response using the `OmdbResult` Effect Schema and returns a `Ratings` object.
- * Returns empty ratings `{}` on any failure (network error, invalid response, etc.).
- */
+/** Fetch enrichment data from OMDB with a Promise compatibility wrapper. */
 export async function fetchOmdbData(
   /** The movie or TV show title to look up. */
   title: string,
@@ -14,12 +10,7 @@ export async function fetchOmdbData(
   apiKey: string = import.meta.env.VITE_OMDB_API_KEY,
 ): Promise<Ratings> {
   try {
-    const encodedTitle = encodeURIComponent(title)
-    const url = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodedTitle}`
-    const response = await fetch(url)
-    const data: unknown = await response.json()
-    const ratings = Schema.decodeUnknownSync(OmdbResult)(data)
-    return ratings
+    return await Effect.runPromise(fetchOmdbDataEffect({ title, apiKey }))
   } catch (error) {
     console.error("Failed to fetch OMDB data:", error)
     return {}

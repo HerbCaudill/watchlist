@@ -51,8 +51,8 @@ Run a single Playwright test: `pnpm test:pw e2e/foo.spec.ts`
 The app follows a phased implementation plan:
 
 1. **Presentational components** — Storybook-driven, each in `src/components/`
-2. **Data layer** — Effect Schema decoders in `src/schema/`
-3. **API services** — TMDB search, OMDB enrichment, trailer lookup in `src/lib/`
+2. **Data layer** — Effect-returning API functions in `src/lib/` with typed `ApiError` failures, retry for transient network/5xx errors, and Effect Schema decoders in `src/schema/`
+3. **API services** — Promise compatibility wrappers for TMDB search/detail/discover, OMDB enrichment, and trailer lookup in `src/lib/`
 4. **DXOS integration** — Echo schema, client provider, watchlist persistence
 5. **Wire together** — Hooks (`useSearch`, `useWatchlist`) connecting data to UI
 
@@ -108,6 +108,7 @@ No semicolons, double quotes, trailing commas, 100 char width, experimental tern
 Tailwind class sorting plugin.
 
 <!-- BEGIN BEADS INTEGRATION -->
+
 ## Issue Tracking with bd (beads)
 
 **IMPORTANT**: This project uses **bd (beads)** for ALL issue tracking. Do NOT use markdown TODOs, task lists, or other tracking methods.
@@ -215,6 +216,7 @@ For more details, see README.md and docs/QUICKSTART.md.
 7. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
+
 - Work is NOT complete until `git push` succeeds
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push

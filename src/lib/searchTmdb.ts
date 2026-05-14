@@ -1,17 +1,8 @@
-import { Schema } from "effect"
+import { Effect } from "@/lib/effect"
+import { searchTmdbEffect } from "@/lib/searchTmdbEffect"
 import type { MediaItem, MediaType } from "@/types"
-import {
-  TmdbMovieSearchResponse,
-  TmdbTvSearchResponse,
-  tmdbMovieResultsToMediaItems,
-  tmdbTvResultsToMediaItems,
-} from "@/schema/TmdbSearchResult"
 
-/**
- * Search TMDB for movies or TV shows by query string.
- * Decodes the response using Effect Schema and converts to MediaItem[].
- * Returns an empty array on any error (network, decoding, etc.).
- */
+/** Search TMDB for movies or TV shows by query string with a Promise compatibility wrapper. */
 export async function searchTmdb(
   /** The search query string. */
   query: string,
@@ -21,18 +12,7 @@ export async function searchTmdb(
   apiKey: string = import.meta.env.VITE_TMDB_API_KEY,
 ): Promise<MediaItem[]> {
   try {
-    const encodedQuery = encodeURIComponent(query)
-    const url = `https://api.themoviedb.org/3/search/${mediaType}?api_key=${apiKey}&query=${encodedQuery}`
-    const response = await fetch(url)
-    const data: unknown = await response.json()
-
-    if (mediaType === "movie") {
-      const decoded = Schema.decodeUnknownSync(TmdbMovieSearchResponse)(data)
-      return tmdbMovieResultsToMediaItems(decoded)
-    } else {
-      const decoded = Schema.decodeUnknownSync(TmdbTvSearchResponse)(data)
-      return tmdbTvResultsToMediaItems(decoded)
-    }
+    return await Effect.runPromise(searchTmdbEffect(query, mediaType, apiKey))
   } catch (error) {
     console.error("Failed to search TMDB:", error)
     return []

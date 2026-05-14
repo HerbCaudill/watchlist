@@ -46,10 +46,17 @@ export function DetailPage() {
       setItem(fetched)
 
       /** Enrich with OMDB ratings and trailer in the background. */
-      const enriched = await enrichMediaItem(fetched)
-      if (!cancelled) {
-        setItem(enriched)
-        setIsLoading(false)
+      try {
+        const enriched = await enrichMediaItem(fetched)
+        if (!cancelled) {
+          setItem(enriched)
+        }
+      } catch {
+        // Keep the fetched TMDB item if enrichment fails.
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
     }
 
