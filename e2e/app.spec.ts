@@ -50,6 +50,26 @@ const mockTmdbTvSearchResponse = {
 }
 
 /**
+ * Mock TMDB movie discover response.
+ */
+const mockTmdbMovieDiscoverResponse = {
+  page: 1,
+  results: mockTmdbMovieSearchResponse.results,
+  total_pages: 2,
+  total_results: 2,
+}
+
+/**
+ * Mock TMDB TV discover response.
+ */
+const mockTmdbTvDiscoverResponse = {
+  page: 1,
+  results: mockTmdbTvSearchResponse.results,
+  total_pages: 1,
+  total_results: 1,
+}
+
+/**
  * Mock OMDB response for enrichment.
  */
 const mockOmdbResponse = {
@@ -107,13 +127,34 @@ async function mockApis(page: Page) {
     await route.fulfill({ json: mockTmdbTvSearchResponse })
   })
 
+  // Mock TMDB movie discover
+  await page.route("**/api.themoviedb.org/3/discover/movie**", async route => {
+    const url = new URL(route.request().url())
+    await route.fulfill({
+      json:
+        url.searchParams.get("page") === "1" ?
+          mockTmdbMovieDiscoverResponse
+        : { page: 2, results: [], total_pages: 2, total_results: 2 },
+    })
+  })
+
+  // Mock TMDB TV discover
+  await page.route("**/api.themoviedb.org/3/discover/tv**", async route => {
+    await route.fulfill({ json: mockTmdbTvDiscoverResponse })
+  })
+
   // Mock TMDB trailer/videos endpoint
   await page.route("**/api.themoviedb.org/3/**/videos**", async route => {
     await route.fulfill({ json: mockTmdbTrailerResponse })
   })
 
-  // Mock TMDB movie detail endpoint (registered after videos to avoid conflicts)
+  // Mock TMDB movie detail endpoint.
   await page.route("**/api.themoviedb.org/3/movie/**", async route => {
+    if (route.request().url().includes("/videos")) {
+      await route.fulfill({ json: mockTmdbTrailerResponse })
+      return
+    }
+
     await route.fulfill({ json: mockTmdbMovieDetailResponse })
   })
 
@@ -152,27 +193,29 @@ test.describe("initial state", () => {
 })
 
 test.describe("tab switching", () => {
-  test("switches to Discover tab and shows 'Coming soon' placeholder", async ({ page }) => {
+  test("switches to Discover tab and shows discovered movies", async ({ page }) => {
+    await mockApis(page)
     await page.goto("/")
     await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
 
     await page.getByRole("tab", { name: "Discover" }).click()
-    await expect(page.getByText("Coming soon")).toBeVisible()
+    await expect(page.getByText("Fight Club")).toBeVisible()
     await expect(page.getByText("Your watchlist is empty")).not.toBeVisible()
   })
 
   test("switches back to Watchlist tab from Discover", async ({ page }) => {
+    await mockApis(page)
     await page.goto("/")
     await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
 
     // Go to Discover
     await page.getByRole("tab", { name: "Discover" }).click()
-    await expect(page.getByText("Coming soon")).toBeVisible()
+    await expect(page.getByText("Fight Club")).toBeVisible()
 
     // Go back to Watchlist
     await page.getByRole("tab", { name: "Watchlist" }).click()
     await expect(page.getByText("Your watchlist is empty")).toBeVisible()
-    await expect(page.getByText("Coming soon")).not.toBeVisible()
+    await expect(page.getByText("Fight Club")).not.toBeVisible()
   })
 
   test("tab aria-selected updates correctly on switch", async ({ page }) => {
@@ -234,7 +277,7 @@ test.describe("search flow", () => {
   test("searching for movies shows results", async ({ page }) => {
     await mockApis(page)
     await page.goto("/movies/discover")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("Fight Club")).toBeVisible({ timeout: 30000 })
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
     await searchInput.fill("Fight Club")
@@ -248,7 +291,7 @@ test.describe("search flow", () => {
   test("searching for TV shows shows results", async ({ page }) => {
     await mockApis(page)
     await page.goto("/tv/discover")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("Breaking Bad")).toBeVisible({ timeout: 30000 })
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
     await searchInput.fill("Breaking Bad")
@@ -256,10 +299,10 @@ test.describe("search flow", () => {
     await expect(page.getByText("Breaking Bad")).toBeVisible()
   })
 
-  test("clearing the search returns to the discover placeholder", async ({ page }) => {
+  test("clearing the search returns to the discover grid", async ({ page }) => {
     await mockApis(page)
     await page.goto("/movies/discover")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("Fight Club")).toBeVisible({ timeout: 30000 })
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
     await searchInput.fill("Fight Club")
@@ -270,30 +313,46 @@ test.describe("search flow", () => {
     // Click the clear button
     await page.getByLabel("Clear search").click()
 
-    // Should return to the "Coming soon" placeholder
-    await expect(page.getByText("Coming soon")).toBeVisible()
+    // Should return to the discover grid
+    await expect(page.getByText("Fight Club")).toBeVisible()
   })
 
   test("empty search results show 'No results'", async ({ page }) => {
     // Mock TMDB to return no results
+    const emptyResponse = { page: 1, results: [], total_pages: 0, total_results: 0 }
     await page.route("**/api.themoviedb.org/3/search/movie**", async route => {
-      await route.fulfill({
-        json: { page: 1, results: [], total_pages: 0, total_results: 0 },
-      })
+      await route.fulfill({ json: emptyResponse })
+    })
+    await page.route("**/api.themoviedb.org/3/search/tv**", async route => {
+      await route.fulfill({ json: emptyResponse })
+    })
+    await page.route("**/api.themoviedb.org/3/discover/movie**", async route => {
+      await route.fulfill({ json: emptyResponse })
     })
 
     await page.goto("/movies/discover")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("No results", { exact: true })).toBeVisible({ timeout: 30000 })
 
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")
     await searchInput.fill("xyznonexistent")
     await searchInput.press("Enter")
 
-    await expect(page.getByText("No results")).toBeVisible()
+    await expect(page.getByText("No results", { exact: true })).toBeVisible()
   })
 })
 
 test.describe("routing", () => {
+  test("clicking a Discover card opens the detail route", async ({ page }) => {
+    await mockApis(page)
+    await page.goto("/movies/discover")
+    await expect(page.getByText("Fight Club")).toBeVisible({ timeout: 30000 })
+
+    await page.getByRole("article").filter({ hasText: "Fight Club" }).click()
+
+    await expect(page).toHaveURL(/\/movies\/550/)
+    await expect(page.getByRole("heading", { name: "Fight Club" })).toBeVisible()
+  })
+
   test("redirects / to /movies/watchlist", async ({ page }) => {
     await page.goto("/")
     await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
@@ -334,8 +393,9 @@ test.describe("routing", () => {
     await page.goto("/movies/watchlist")
     await expect(page.getByText("Your watchlist is empty")).toBeVisible({ timeout: 30000 })
 
+    await mockApis(page)
     await page.getByRole("tab", { name: "Discover" }).click()
-    await expect(page.getByText("Coming soon")).toBeVisible()
+    await expect(page.getByText("Fight Club")).toBeVisible()
 
     await page.goBack()
     await expect(page.getByText("Your watchlist is empty")).toBeVisible()
@@ -381,7 +441,7 @@ test.describe("add to watchlist", () => {
   }) => {
     await mockApis(page)
     await page.goto("/movies/discover")
-    await expect(page.getByText("Coming soon")).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText("Fight Club")).toBeVisible({ timeout: 30000 })
 
     // Search for movies
     const searchInput = page.getByPlaceholder("Search movies & TV shows...")

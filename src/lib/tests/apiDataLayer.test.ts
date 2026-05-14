@@ -51,11 +51,11 @@ describe("Effect data layer", () => {
 
     expect(fetch).toHaveBeenNthCalledWith(
       1,
-      "https://api.themoviedb.org/3/discover/movie?api_key=tmdb-key&page=2&sort_by=popularity.desc&release_date.gte=2026-01-01&release_date.lte=2026-12-31",
+      "https://api.themoviedb.org/3/discover/movie?api_key=tmdb-key&page=2&sort_by=popularity.desc&vote_count.gte=100&include_adult=false&language=en-US&include_video=false&primary_release_date.gte=2026-01-01&primary_release_date.lte=2026-12-31",
     )
     expect(fetch).toHaveBeenNthCalledWith(
       2,
-      "https://api.themoviedb.org/3/discover/tv?api_key=tmdb-key&page=3&sort_by=popularity.desc&first_air_date.gte=2026-01-01&first_air_date.lte=2026-12-31",
+      "https://api.themoviedb.org/3/discover/tv?api_key=tmdb-key&page=3&sort_by=popularity.desc&vote_count.gte=100&include_adult=false&language=en-US&first_air_date.gte=2026-01-01&first_air_date.lte=2026-12-31",
     )
   })
 

@@ -1,27 +1,10 @@
-import { MediaCard } from "@/components/MediaCard"
+import { MediaGrid } from "@/components/MediaGrid"
 import type { MediaItem } from "@/types"
 
 /** Responsive grid of MediaCards for displaying search results. */
 export function SearchResults({ items, watchlistIds, onAdd, isLoading = false }: Props) {
-  if (isLoading) {
-    return <p className="text-muted-foreground py-8 text-center text-sm">Loading...</p>
-  }
-
-  if (items.length === 0) {
-    return <p className="text-muted-foreground py-8 text-center text-sm">No results</p>
-  }
-
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-4">
-      {items.map(item => (
-        <MediaCard
-          key={item.id}
-          item={item}
-          isOnWatchlist={watchlistIds.has(item.id)}
-          onAction={onAdd}
-        />
-      ))}
-    </div>
+    <MediaGrid items={items} watchlistIds={watchlistIds} onAction={onAdd} isLoading={isLoading} />
   )
 }
 

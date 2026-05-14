@@ -12,8 +12,16 @@ export function buildTmdbDiscoverUrl(
     api_key: options.apiKey,
     page: String(options.page ?? 1),
     sort_by: "popularity.desc",
+    "vote_count.gte": "100",
+    include_adult: "false",
+    language: "en-US",
   })
-  const datePrefix = mediaType === "movie" ? "release_date" : "first_air_date"
+
+  if (mediaType === "movie") {
+    params.set("include_video", "false")
+  }
+
+  const datePrefix = mediaType === "movie" ? "primary_release_date" : "first_air_date"
   if (options.fromDate) params.set(`${datePrefix}.gte`, options.fromDate)
   if (options.toDate) params.set(`${datePrefix}.lte`, options.toDate)
   return `https://api.themoviedb.org/3/discover/${mediaType}?${params.toString().replace(/\+/g, "%20")}`

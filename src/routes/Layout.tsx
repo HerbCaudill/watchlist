@@ -91,7 +91,11 @@ export function Layout() {
       mediaType={mediaType}
       onMediaTypeChange={handleMediaTypeChange}
     >
-      <Outlet context={{ watchlist, watchlistMediaItems, mediaType } satisfies LayoutContext} />
+      <Outlet
+        context={
+          { watchlist, watchlistMediaItems, watchlistIds, mediaType } satisfies LayoutContext
+        }
+      />
     </AppShell>
   )
 }
@@ -100,5 +104,6 @@ export function Layout() {
 export type LayoutContext = {
   watchlist: ReturnType<typeof useWatchlist>
   watchlistMediaItems: ReturnType<typeof watchlistItemToMediaItem>[]
+  watchlistIds: Set<string>
   mediaType: MediaType
 }
