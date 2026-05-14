@@ -36,7 +36,7 @@ type CacheEnvelope<T> = {
 
 Cache failures should never break app behavior. Corrupted, expired, wrong-version, unavailable, or quota-failed entries should be ignored with at most a dev warning.
 
-Add a shared media-item cache keyed by media type and TMDB ID, e.g. `media:movie:550`. Cache the full enriched `MediaItem`, not partial metadata. Use a long TTL; start with 30 days. Expired media-item cache entries may be returned stale-while-revalidate where a caller can support that, but the canonical enrichment path should refresh and rewrite the cache.
+Add a shared media-item cache keyed by media type and TMDB ID, e.g. `media:movie:550`. Cache the full enriched `MediaItem`, not partial metadata. Use a long TTL; start with 30 days. Discover may return expired media-item cache entries immediately as stale-while-revalidate, while the canonical enrichment path refreshes and rewrites the cache in the background.
 
 ## Tasks
 
@@ -51,13 +51,16 @@ Add a shared media-item cache keyed by media type and TMDB ID, e.g. `media:movie
 9. Convert `enrichMediaItem(item)` to compose OMDB and trailer effects in parallel and return a fully enriched item.
 10. Route search, detail handoff, and Discover through the shared enrichment path.
 11. Add Promise compatibility wrappers for current search/detail callers, preserving existing UI behavior while the core API moves to typed Effects.
-12. Implement `useDiscover` using `Effect.forEach(..., { concurrency: 5 })`, score filtering, sorting, cancellation, and normal React state.
+12. Implement `useDiscover` using `Effect.forEach(..., { concurrency: 5 })`, best-first score sorting, cancellation, stale-while-revalidate cache handling, and normal React state.
 13. Replace the Discover placeholder with a wired discover view and tests.
 14. Update tests around retry, typed failures, cache tolerance, cache TTL/version behavior, OMDB lookup parameters, partial/skipped item behavior, filtering, sorting, and hook state.
 
+## Decisions
+
+1. Discover should not apply a default minimum `normalizedScore`; it should sort best-first instead.
+2. Discover should keep items when enrichment fails, using partial or empty enrichment where necessary.
+3. Discover may use stale-while-revalidate cached media items immediately while refreshing them in the background.
+
 ## Unresolved Questions
 
-1. What minimum `normalizedScore` should Discover use by default?
-2. Should enrichment failures keep an item with partial/empty ratings, or exclude that item from Discover?
-3. Which TMDB discover options should ship first: sort order, release date window, genre filters, page count, or watch-provider filters?
-4. Should Discover use stale-while-revalidate cached media items immediately, or wait for canonical refresh before showing results?
+None.
