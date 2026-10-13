@@ -17,15 +17,16 @@ export function PosterImage({ src, alt, size = "md" }: Props) {
 
   return (
     <div className={cn("aspect-2/3 overflow-hidden rounded-md", sizeClasses[size])}>
-      {src ?
+      {src ? (
         <img src={src} alt={alt} className="h-full w-full object-cover" />
-      : <div
+      ) : (
+        <div
           aria-label={alt}
           className="bg-muted text-muted-foreground flex h-full w-full items-center justify-center"
         >
           <IconMovie size={iconSizes[size]} stroke={1.5} />
         </div>
-      }
+      )}
     </div>
   )
 }

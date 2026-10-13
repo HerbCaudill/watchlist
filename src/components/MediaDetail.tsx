@@ -32,9 +32,11 @@ export function MediaDetail({ item, isOnWatchlist = false, onAction, onClose }: 
               isOnWatchlist ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700",
             )}
           >
-            {isOnWatchlist ?
+            {isOnWatchlist ? (
               <IconMinus size={18} stroke={2.5} />
-            : <IconPlus size={18} stroke={2.5} />}
+            ) : (
+              <IconPlus size={18} stroke={2.5} />
+            )}
           </button>
         )}
       </div>

@@ -65,12 +65,13 @@ export function SearchCombobox({
       >
         {/* Left: poster thumbnail */}
         <div className="aspect-2/3 w-8 shrink-0 overflow-hidden rounded">
-          {item.posterUrl ?
+          {item.posterUrl ? (
             <img src={item.posterUrl} alt="" className="h-full w-full object-cover" />
-          : <div className="bg-muted text-muted-foreground flex h-full w-full items-center justify-center">
+          ) : (
+            <div className="bg-muted text-muted-foreground flex h-full w-full items-center justify-center">
               <IconMovie size={14} stroke={1.5} />
             </div>
-          }
+          )}
         </div>
 
         {/* Middle: title + metadata */}
@@ -85,9 +86,10 @@ export function SearchCombobox({
         </div>
 
         {/* Right: checkmark if on watchlist, or add button if not */}
-        {onWatchlist ?
+        {onWatchlist ? (
           <IconCheck className="size-4 shrink-0 text-green-600" stroke={2} />
-        : onAdd && (
+        ) : (
+          onAdd && (
             <button
               type="button"
               aria-label="Add to watchlist"
@@ -104,7 +106,7 @@ export function SearchCombobox({
               <IconPlus className="size-4" stroke={2} />
             </button>
           )
-        }
+        )}
       </CommandPrimitive.Item>
     )
   }
@@ -148,16 +150,17 @@ export function SearchCombobox({
       {showDropdown && (
         <div className="absolute top-full right-0 left-0 z-50 mt-1">
           <CommandPrimitive.List className="max-h-80 overflow-y-auto rounded-md border bg-white shadow-lg">
-            {isLoading && !hasResults ?
+            {isLoading && !hasResults ? (
               <div className="text-muted-foreground py-6 text-center text-sm">Searching...</div>
-            : !hasResults ?
+            ) : !hasResults ? (
               <CommandPrimitive.Empty className="text-muted-foreground py-6 text-center text-sm">
                 No results found
               </CommandPrimitive.Empty>
-            : <CommandPrimitive.Group className="overflow-hidden px-1 py-1">
+            ) : (
+              <CommandPrimitive.Group className="overflow-hidden px-1 py-1">
                 {results.map(renderItem)}
               </CommandPrimitive.Group>
-            }
+            )}
           </CommandPrimitive.List>
         </div>
       )}

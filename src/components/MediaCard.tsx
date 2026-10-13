@@ -29,9 +29,11 @@ export function MediaCard({ item, onAction, isOnWatchlist = false }: Props) {
               isOnWatchlist ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700",
             )}
           >
-            {isOnWatchlist ?
+            {isOnWatchlist ? (
               <IconMinus size={16} stroke={2.5} />
-            : <IconPlus size={16} stroke={2.5} />}
+            ) : (
+              <IconPlus size={16} stroke={2.5} />
+            )}
           </button>
         )}
       </div>

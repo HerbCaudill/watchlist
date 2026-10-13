@@ -20,7 +20,7 @@ pnpm test:pw:headed       # Playwright in headed browser
 pnpm test:pw:ui           # Playwright UI mode
 pnpm test:all             # Full suite: typecheck + vitest + playwright
 pnpm typecheck            # TypeScript type checking only
-pnpm format               # Prettier formatting
+pnpm format               # oxfmt formatting
 pnpm storybook            # Storybook dev server on port 6006
 pnpm build:storybook      # Build static Storybook site
 ```
@@ -102,10 +102,9 @@ API keys are loaded via Vite's `import.meta.env`:
   from `let` to `var` in the generated output (both main bundle and worker). This is needed until
   Rollup fixes the variable ordering for class computed property keys.
 
-## Prettier config
+## oxfmt config
 
-No semicolons, double quotes, trailing commas, 100 char width, experimental ternaries,
-Tailwind class sorting plugin.
+No semicolons, double quotes, trailing commas, 100 char width, Tailwind class sorting.
 
 ## Landing the Plane (Session Completion)
 

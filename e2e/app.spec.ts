@@ -132,9 +132,9 @@ async function mockApis(page: Page) {
     const url = new URL(route.request().url())
     await route.fulfill({
       json:
-        url.searchParams.get("page") === "1" ?
-          mockTmdbMovieDiscoverResponse
-        : { page: 2, results: [], total_pages: 2, total_results: 2 },
+        url.searchParams.get("page") === "1"
+          ? mockTmdbMovieDiscoverResponse
+          : { page: 2, results: [], total_pages: 2, total_results: 2 },
     })
   })
 

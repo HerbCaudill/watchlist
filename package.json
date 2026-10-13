@@ -1,7 +1,7 @@
 {
   "name": "watchlist",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "localhost-dev pnpm dev:app",
@@ -13,7 +13,7 @@
     "test:pw:headed": "playwright test --headed",
     "test:all": "pnpm typecheck && pnpm test run && pnpm test:pw --max-failures=1",
     "typecheck": "tsc -b --noEmit",
-    "format": "prettier --write .",
+    "format": "oxfmt",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
     "ralph": "npx @herbcaudill/ralph",
@@ -56,8 +56,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "jsdom": "^28.0.0",
-    "prettier": "^3.8.1",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "oxfmt": "^0.53.0",
     "shadcn": "^3.8.4",
     "storybook": "^8.6.15",
     "tailwindcss": "^4.1.18",

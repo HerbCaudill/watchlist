@@ -11,7 +11,7 @@ export function getRequiredApiKey(
   serviceName: string,
 ) {
   const key = explicitKey ?? defaultKey
-  return key ?
-      Effect.succeed(key)
+  return key
+    ? Effect.succeed(key)
     : Effect.fail<ApiError>({ _tag: "ConfigError", message: `Missing ${serviceName} API key` })
 }

@@ -1,0 +1,12 @@
+allowBuilds:
+  "@parcel/watcher": false
+  "@swc/core": false
+  cbor-extract: false
+  classic-level: false
+  esbuild: true
+  fs-ext: false
+  msw: false
+  node-datachannel: false
+  protobufjs: false
+  sharp: false
+  sodium-native: false
